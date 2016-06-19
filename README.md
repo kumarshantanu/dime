@@ -1,9 +1,9 @@
 # dime
 
-Dependency Injection Made Easy for Clojure.
+> Dependency Injection Made Easy for Clojure.
 
 Dime implements [dependency injection/inversion](https://en.wikipedia.org/wiki/Dependency_inversion_principle) by
-creating partially applied functions in an inexpensive (boiler-plate free), mostly automated way.
+creating partially applied functions in an inexpensive (boiler-plate free), mostly automated manner.
 
 
 ## Usage
