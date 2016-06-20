@@ -116,22 +116,32 @@
     (ns-vars->graph [{} {}] ns-symbols)))
 
 
+(defn process-post-inject
+  "Return the result of applying f to remaining args if f is non-nil, injected instance otherwise. Default post-inject
+  processor.
+  Arguments:
+   post-inject ; post-inject fn
+   resolved    ; resolved map of seed + dependencies so far
+   inject-key  ; inject key for the var
+   injected    ; the partial fn created from the var"
+  [post-inject resolved inject-key injected]
+  (if post-inject
+    (post-inject resolved inject-key injected)
+    injected))
+
+
 (defn inject-all
   "Given a map of name/var pairs and seed data map, resolve/inject all dependencies and return a map of
   name/partially-applied-function pairs."
-  ([graph seed {:keys [post-inject-wrapper]
-                :or {post-inject-wrapper (fn [f  ; post-inject fn
-                                              m  ; resolved seed+dependencies so far
-                                              k  ; inject key for the var
-                                              p  ; the partial fn created from the var
-                                              ] (f m k p))}
+  ([graph seed {:keys [post-inject-processor]
+                :or {post-inject-processor process-post-inject}
                 :as options}]
     (i/expected map? "a dependency graph as a map" graph)
     (i/expected map? "seed data to begin injection" seed)
     (reduce (fn inject-one [m [k the-var]]
-              (let [post-inject (fn [m p] (if-let [pi (get (meta the-var) *post-inject-meta-key*)]
-                                            (post-inject-wrapper pi m k p)
-                                            p))
+              (let [post-inject (fn [m p] (-> (meta the-var)
+                                            (get *post-inject-meta-key*)
+                                            (post-inject-processor m k p)))
                     inject-deps (fn [m] (if (contains? m k)             ; avoid duplicate resolution
                                           m
                                           (->> options                  ; propagate options for `pre-inject` processing

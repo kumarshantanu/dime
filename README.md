@@ -95,7 +95,7 @@ The code required to actually resolve and inject the dependencies is quite trivi
 `dime.core/inject-all` (and `dime.core/inject`) allows an option map argument to customize the runtime behavior.
 
 * Option `:pre-index` may be useful to `deref` the vars (for faster dispatch) before making a partial fn
-* Option `:post-inject-wrapper` may be useful to catch any exceptions arising from post-injection handlers
+* Option `:post-inject-processor` may be useful to catch any exceptions arising from post-injection handlers
 
 
 ## License

@@ -21,4 +21,4 @@
   * Seed data
   * Matching inject keys across arguments and vars
   * Pre-inject processing: option `:pre-inject`
-  * Post-inject processing: option `:post-inject-wrapper`
+  * Post-inject processing: option `:post-inject-processor`
