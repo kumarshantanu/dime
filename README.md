@@ -87,6 +87,7 @@ The code required to actually resolve and inject the dependencies is quite trivi
 * The `defn` var names are keywordized to form their injection names unless overridden by the `:inject` tag.
 * The `:inject` tags on `defn` arguments are matched against the `:inject` names of the `defn` vars.
 * Arguments marked with `:inject` are looked up in seed data first, followed by other dependencies.
+* The `:pre-inject` tag is used for custom processing before partial fn is created. By default, no processing is done.
 * The `:post-inject` tag is used for custom processing after partial fn is created. By default, no processing is done.
 
 
@@ -94,7 +95,7 @@ The code required to actually resolve and inject the dependencies is quite trivi
 
 `dime.core/inject-all` (and `dime.core/inject`) allows an option map argument to customize the runtime behavior.
 
-* Option `:pre-index` may be useful to `deref` the vars (for faster dispatch) before making a partial fn
+* Option `:pre-inject-processor` may be useful to `deref` the vars (for faster dispatch) before making a partial fn
 * Option `:post-inject-processor` may be useful to catch any exceptions arising from post-injection handlers
 
 

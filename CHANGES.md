@@ -12,6 +12,7 @@
 * Support for annotated code via meta data
   * Dependency arguments: tag `:inject`
   * Partially applied `defn` var: tag `:inject`
+  * Pre-inject processing: tag `:pre-inject`
   * Post-inject processing: tag `:post-inject`
   * Customizable tags via dynamic vars
 * Support for discovering dependency
@@ -20,5 +21,5 @@
 * Support for resolving dependency
   * Seed data
   * Matching inject keys across arguments and vars
-  * Pre-inject processing: option `:pre-inject`
+  * Pre-inject processing: option `:pre-inject-processor`
   * Post-inject processing: option `:post-inject-processor`

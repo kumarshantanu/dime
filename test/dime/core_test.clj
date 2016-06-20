@@ -86,7 +86,7 @@
           (is (= :foo (db-create-order :dummy)) "Var must be associated with partial"))))
     (testing "pre-inject dissociates from var"
       (reset! foo.db/init-count 0)
-      (let [injected (di/inject-all di-graph seed-map {:pre-inject (fn [the-var args] @the-var)})
+      (let [injected (di/inject-all di-graph seed-map {:pre-inject-processor (fn [pre-inject the-var args] @the-var)})
             {:keys [connection-pool
                     db-create-order
                     find-items]} injected]
@@ -123,7 +123,7 @@
           (is (= :foo (db-create-order :dummy)) "Var must be associated with partial"))))
     (testing "pre-inject dissociates from var"
       (reset! foo.db/init-count 0)
-      (let [injected (di/inject-all di-graph seed-map {:pre-inject (fn [the-var args] @the-var)})
+      (let [injected (di/inject-all di-graph seed-map {:pre-inject-processor (fn [pre-inject the-var args] @the-var)})
             {:keys [connection-pool
                     db-create-order
                     find-items

@@ -30,14 +30,30 @@
 (def ^:dynamic *inject-meta-key* :inject)
 
 
+(def ^:dynamic *pre-inject-meta-key* :pre-inject)
+
+
 (def ^:dynamic *post-inject-meta-key* :post-inject)
+
+
+(defn process-pre-inject
+  "Return the result of applying pre-inject fn to remaining args if pre-inject is non-nil, pre-injected var
+  otherwise. Default pre-inject processor.
+  Arguments:
+   pre-inject  ; pre-inject fn
+   the-var     ; the var to be injected with dependencies
+   args        ; map to resolve dependencies from"
+  [pre-inject the-var args]
+  (if pre-inject
+    (pre-inject the-var args)
+    the-var))
 
 
 (defn inject*
   "Given a var defined with defn and an argument map, look up the :inject metadata on arguments and return a partially
   applied function."
-  ([the-var args {:keys [pre-inject]
-                  :or {pre-inject (fn [the-var args] the-var)}}]
+  ([the-var args {:keys [pre-inject-processor]
+                  :or {pre-inject-processor process-pre-inject}}]
     (i/expected defn? "a var created with clojure.core/defn" the-var)
     (i/expected map? "a map" args)
     (let [name-sym (gensym)
@@ -56,7 +72,9 @@
                              symbol)
                         ~@body-exp))]
       (try
-        (binding [i/*original-fn* (pre-inject the-var args)
+        (binding [i/*original-fn* (-> (meta the-var)
+                                    (get *pre-inject-meta-key*)
+                                    (pre-inject-processor the-var args))
                   i/*inject-args* args]
           (eval fn-maker))
         (catch ExceptionInInitializerError e  ; this may happen in Clojure 1.6 and below
@@ -117,8 +135,8 @@
 
 
 (defn process-post-inject
-  "Return the result of applying f to remaining args if f is non-nil, injected instance otherwise. Default post-inject
-  processor.
+  "Return the result of applying post-inject fn to remaining args if post-inject is non-nil, injected instance
+  otherwise. Default post-inject processor.
   Arguments:
    post-inject ; post-inject fn
    resolved    ; resolved map of seed + dependencies so far
