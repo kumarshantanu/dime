@@ -1,5 +1,12 @@
 # History and TODO
 
+## TODO
+
+* [TODO] Create a protocol for extracting name (optional) and dependencies
+* [TODO] Create a protocol for realizing the dependent
+* [TODO] Implement realizing vars as an extension (implementation detail)
+
+
 ## 0.1.0 / 2016-June-??
 
 * Support for annotated code via meta data
