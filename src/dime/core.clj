@@ -139,12 +139,12 @@
   otherwise. Default post-inject processor.
   Arguments:
    post-inject ; post-inject fn
-   resolved    ; resolved map of seed + dependencies so far
+   injected    ; the partial fn created from the var
    inject-key  ; inject key for the var
-   injected    ; the partial fn created from the var"
-  [post-inject resolved inject-key injected]
+   resolved    ; resolved map of seed + dependencies so far"
+  [post-inject injected inject-key resolved]
   (if post-inject
-    (post-inject resolved inject-key injected)
+    (post-inject injected inject-key resolved)
     injected))
 
 
@@ -159,7 +159,7 @@
     (reduce (fn inject-one [m [k the-var]]
               (let [post-inject (fn [m p] (-> (meta the-var)
                                             (get *post-inject-meta-key*)
-                                            (post-inject-processor m k p)))
+                                            (post-inject-processor p k m)))
                     inject-deps (fn [m] (if (contains? m k)             ; avoid duplicate resolution
                                           m
                                           (->> options                  ; propagate options for `pre-inject` processing

@@ -14,7 +14,7 @@
 
 
 (defn ^{:inject :connection-pool
-        :post-inject (fn [m k f] (f))}
+        :post-inject (fn [f k m] (f))}
       make-conn-pool
   [^:inject db-host ^:inject db-port ^:inject username ^:inject password]
   (swap! init-count inc)

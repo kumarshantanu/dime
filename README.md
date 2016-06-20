@@ -25,7 +25,7 @@ Notice the meta data tags (`:inject`, `:post-inject`) used in the code.
 ;; ---------------- in namespace foo.db ----------------
 
 (defn ^{:inject :connection-pool
-        :post-inject (fn [m f] (f))}  ; custom processing: execute the fn to obtain connection-pool
+        :post-inject (fn [f k m] (f))}  ; custom processing: execute the fn to obtain connection-pool
       make-conn-pool
   [^:inject db-host ^:inject db-port ^:inject username ^:inject password]
   :dummy-pool)
