@@ -14,4 +14,5 @@
              :c18 {:dependencies [[org.clojure/clojure "1.8.0"]]
                    :global-vars {*unchecked-math* :warn-on-boxed}}
              :c19 {:dependencies [[org.clojure/clojure "1.9.0-alpha7"]]
-                   :global-vars {*unchecked-math* :warn-on-boxed}}})
+                   :global-vars {*unchecked-math* :warn-on-boxed}}
+             :dln {:jvm-opts ["-Dclojure.compiler.direct-linking=true"]}})
