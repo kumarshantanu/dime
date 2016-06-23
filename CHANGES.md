@@ -10,7 +10,7 @@
   * [TODO] Visibility control for injectibles per context
 
 
-## 0.1.0 / 2016-June-??
+## 0.1.0 / 2016-June-23
 
 * Support for annotated code via meta data
   * Dependency arguments: tag `:inject`

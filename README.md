@@ -1,14 +1,16 @@
 # dime
 
-**Dependency Injection Made Easy for Clojure.**
+Dependency Injection Made Easy for Clojure.
 
 Dime implements [dependency injection/inversion](https://en.wikipedia.org/wiki/Dependency_inversion_principle) by
 creating partially applied functions in an inexpensive (boiler-plate free), mostly automated manner.
 
+**(Disclaimer: Early days. Consider this alpha. Expect breaking changes across versions.)**
+
 
 ## Usage
 
-Leiningen coordinates: `[dime "0.1.0-SNAPSHOT"]` (not on Clojars yet)
+Leiningen coordinates: `[dime "0.1.0"]`
 
 
 ### Example
