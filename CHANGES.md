@@ -10,6 +10,15 @@
   * [TODO] Visibility control for injectibles per context
 
 
+## 0.2.0 / 2016-July-??
+
+* A protocol called `dime.type/Injectable` for injectable types
+  * Covers obtaining injection metadata and carrying out injection
+  * Vars (created with `clojure.core/defn`) implement this protocol as an implementation detail
+* [BREAKING CHANGE] Now `dime.core/inject` is a fn and works with injectables only
+* [BREAKING CHANGE] Var-related API moved to `dime.var`
+
+
 ## 0.1.0 / 2016-June-23
 
 * Support for annotated code via meta data

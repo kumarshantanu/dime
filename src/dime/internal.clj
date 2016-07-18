@@ -9,7 +9,8 @@
 
 (ns dime.internal
   (:require
-    [clojure.string :as string]))
+    [clojure.string :as string]
+    [dime.type :as t]))
 
 
 ;; ----- error reporting -----
@@ -59,6 +60,22 @@
 
 ;; ----- helpers -----
 
+(defn named-injectables->graph
+  "Given a map of names/id-keys (presumably inferred) to injectables, return a vector [implicit explicit] of
+  name/injectable maps for implicitly and explicitly inject-annotated injectables."
+  ([[implicit explicit] name-injectable-map]
+    (reduce (fn [[implicit explicit] [id-key injectable]]
+              (expected t/injectable? "a valid injectable" injectable)
+              (if-let [inject-key (t/id-key injectable)]
+                [implicit (assoc explicit inject-key injectable)]
+                [(assoc implicit (keyword id-key) injectable) explicit]))
+      [implicit explicit] name-injectable-map))
+  ([name-injectable-map]
+    (named-injectables->graph [{} {}] name-injectable-map)))
+
+
+;; ----- var helpers -----
+
 
 (def ^:dynamic *original-fn* nil)
 
@@ -102,17 +119,6 @@
     [inject-args (if var-args?
                    `(~expose-syms (apply ~name-sym ~@invoke-syms))
                    `(~expose-syms (~name-sym ~@invoke-syms)))]))
-
-
-(defn var-dep-inject-keys
-  "Return all dependency inject-keys for the given var."
-  [inject-meta-key v]
-  (->> (meta v)
-    :arglists
-    (map (partial inject-prepare inject-meta-key v))
-    (mapcat first)
-    (map :inject-key)
-    distinct))
 
 
 (defn get-val

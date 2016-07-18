@@ -1,0 +1,88 @@
+;   Copyright (c) Shantanu Kumar. All rights reserved.
+;   The use and distribution terms for this software are covered by the
+;   Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+;   which can be found in the file LICENSE at the root of this distribution.
+;   By using this software in any fashion, you are agreeing to be bound by
+;   the terms of this license.
+;   You must not remove this notice, or any other, from this software.
+
+
+(ns dime.var-test
+  (:require
+    [clojure.test :refer :all]
+    [dime.core :as di]
+    [dime.var  :as dv]
+    [foo.db])
+  (:import
+    [clojure.lang ArityException]))
+
+
+(deftest test-vars-inject
+  (let [di-graph (->> (dv/vars->graph [#'foo.db/make-conn-pool
+                                       #'foo.db/db-find-items
+                                       #'foo.db/db-create-order])
+                   (apply merge))
+        seed-map {:db-host "localhost"
+                  :db-port 3306
+                  :username "dbuser"
+                  :password "s3cr3t"}]
+    (testing "default config"
+      (reset! foo.db/init-count 0)
+      (let [injected (di/inject-all di-graph seed-map)
+            {:keys [connection-pool
+                    db-create-order
+                    find-items]} injected]
+        (is (= 1 @foo.db/init-count) "Initialization must happen exactly once")
+        (is (= :dummy-pool                 connection-pool))
+        (is (= {:items :dummy}             (find-items :dummy)))
+        (is (= {:created-order :dummy}     (db-create-order :dummy)))
+        (with-redefs [foo.db/db-create-order (constantly :foo)]
+          (is (= :foo (db-create-order :dummy)) "Var must be associated with partial"))))
+    (testing "pre-inject dissociates from var"
+      (reset! foo.db/init-count 0)
+      (let [injected (di/inject-all di-graph seed-map {:pre-inject-processor (fn [pre-inject the-var args] @the-var)})
+            {:keys [connection-pool
+                    db-create-order
+                    find-items]} injected]
+        (is (= 1 @foo.db/init-count) "Initialization must happen exactly once")
+        (with-redefs [foo.db/db-create-order (constantly :foo)]
+          (is (= {:created-order :dummy} (db-create-order :dummy)) "Var must be dissociated with partial"))))))
+
+
+(deftest test-ns-vars-inject
+  (let [di-graph (->> (dv/ns-vars->graph ['foo.web
+                                          'foo.service
+                                          'foo.db])
+                   (apply merge))
+        seed-map {:db-host "localhost"
+                  :db-port 3306
+                  :username "dbuser"
+                  :password "s3cr3t"}]
+    (testing "default config"
+      (reset! foo.db/init-count 0)
+      (let [injected (di/inject-all di-graph seed-map)
+            {:keys [connection-pool
+                    db-create-order
+                    find-items
+                    service-create-order
+                    web-create-order]} injected]
+        (is (= 1 @foo.db/init-count) "Initialization must happen exactly once")
+        (is (= :dummy-pool                 connection-pool))
+        (is (= {:items :dummy}             (find-items :dummy)))
+        (is (= {:created-order :dummy}     (db-create-order :dummy)))
+        (is (= {:created-order
+                {:order-data :dummy}}      (service-create-order :dummy-user :dummy-order)))
+        (is (= {:response :dummy-response} (web-create-order {})))
+        (with-redefs [foo.db/db-create-order (constantly :foo)]
+          (is (= :foo (db-create-order :dummy)) "Var must be associated with partial"))))
+    (testing "pre-inject dissociates from var"
+      (reset! foo.db/init-count 0)
+      (let [injected (di/inject-all di-graph seed-map {:pre-inject-processor (fn [pre-inject the-var args] @the-var)})
+            {:keys [connection-pool
+                    db-create-order
+                    find-items
+                    service-create-order
+                    web-create-order]} injected]
+        (is (= 1 @foo.db/init-count) "Initialization must happen exactly once")
+        (with-redefs [foo.db/db-create-order (constantly :foo)]
+          (is (= {:created-order :dummy} (db-create-order :dummy)) "Var must be dissociated with partial"))))))
