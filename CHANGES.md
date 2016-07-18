@@ -2,12 +2,9 @@
 
 ## TODO
 
-* [TODO] Create a protocol for extracting name (optional) and dependencies
-* [TODO] Create a protocol for realizing the dependent (and pre-inject, post-inject)
-* [TODO] Implement realizing vars as an extension (implementation detail)
 * [TODO] Introduce injection contexts
-  * [TODO] Identification mechanism for injectibles per context
-  * [TODO] Visibility control for injectibles per context
+  * [TODO] Identification mechanism for injectables per context
+  * [TODO] Visibility control for injectables per context
 
 
 ## 0.2.0 / 2016-July-??
