@@ -11,6 +11,7 @@
   (:require
     [clojure.test :refer :all]
     [dime.core :as di]
+    [dime.type :as t]
     [foo.db])
   (:import
     [clojure.lang ArityException]))
@@ -61,3 +62,26 @@
     (is (thrown? ArityException (f-3)))
     (is (= [10 [20 40] 30]             (f-3 30)))
     (is (= [10 {:b 20 :d 40} 30 '(40)] (f-3 30 40)))))
+
+
+(deftest test-deps-all
+  (let [f (fn [id ds] (reify t/Injectable
+                        (valid?   [_] true)
+                        (id-key   [_] id)
+                        (dep-keys [_] ds)
+                        (inject   [_ deps pre] :injected)
+                        (pre-inject-fn  [_] nil)
+                        (post-inject-fn [_] nil)))
+        g (reduce (fn [m x]
+                    (assoc m (t/id-key x) x))
+            {} [(f :foo [:bar :baz])
+                (f :bar [:x :y])
+                (f :baz [:p :q])])]
+    (is (= {:x []
+            :y []
+            :p []
+            :q []
+            :foo [:bar :baz]
+            :bar [:x :y]
+            :baz [:p :q]}
+          (di/deps-all g)))))
