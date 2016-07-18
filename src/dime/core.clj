@@ -99,3 +99,11 @@
       seed graph))
   ([graph seed]
     (inject-all graph seed {})))
+
+
+(defn deps-all
+  "Given a map of name/injectable pairs, return a map of name/depdendency-keys pairs."
+  [graph]
+  (reduce (fn [m [k injectable]]
+            (assoc m k (vec (t/dep-keys injectable))))
+    {} graph))
