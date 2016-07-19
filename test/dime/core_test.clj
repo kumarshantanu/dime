@@ -76,12 +76,10 @@
                     (assoc m (t/id-key x) x))
             {} [(f :foo [:bar :baz])
                 (f :bar [:x :y])
-                (f :baz [:p :q])])]
-    (is (= {:x []
-            :y []
-            :p []
-            :q []
-            :foo [:bar :baz]
+                (f :baz [:p :q])
+                (f :qux [])])]
+    (is (= {:foo [:bar :baz]
             :bar [:x :y]
-            :baz [:p :q]}
+            :baz [:p :q]
+            :qux []}
           (di/dependency-graph g)))))

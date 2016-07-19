@@ -105,16 +105,6 @@
 (defn dependency-graph
   "Given a map of name/injectable pairs, return a map of name/depdendency-keys pairs."
   [graph]
-  (let [deps (reduce (fn [m [k injectable]]
-                       (assoc m k (vec (t/dep-keys injectable))))
-               {} graph)]
-    (as-> deps $
-      ;; collect leaf-level dependencies not present at the root level
-      (reduce (fn [a [k dep-keys]]
-                (->> dep-keys
-                  (filter #(not (contains? deps %)))
-                  (concat a)
-                  distinct))
-        [] $)
-      (zipmap $ (repeat []))
-      (merge deps $))))
+  (reduce (fn [m [k injectable]]
+            (assoc m k (vec (t/dep-keys injectable))))
+    {} graph))
