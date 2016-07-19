@@ -10,7 +10,7 @@
 (ns foo.web)
 
 
-(defn find-user
+(defn ^:inject find-user
   [session]
   :dummy-user)
 

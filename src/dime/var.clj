@@ -32,7 +32,11 @@
 (extend-protocol t/Injectable
   clojure.lang.Var
   (valid?   [the-var] (defn? the-var))
-  (id-key   [the-var] (get (meta the-var) *inject-meta-key*))
+  (id-key   [the-var] (let [dm (meta the-var)
+                            ik (get dm *inject-meta-key*)]
+                        (if (true? ik)
+                          (keyword (:name dm))
+                          ik)))
   (dep-keys [the-var] (->> (meta the-var)
                         :arglists
                         (map (partial i/inject-prepare *inject-meta-key* the-var))
@@ -91,6 +95,12 @@
               (require ns-sym)
               (->> (ns-publics ns-sym)        ; select public vars only
                 (filter #(defn? (second %)))  ; select vars created with defn only
+                (filter (fn [[k v]]           ; select vars having at least one injection annotation
+                          (let [dm (meta v)]
+                            (->> (:arglists dm)
+                              (apply concat)
+                              (some #(get (meta %) *inject-meta-key*))
+                              (or (get dm *inject-meta-key*))))))
                 (i/named-injectables->graph [implicit explicit])))
       [implicit explicit] ns-symbols))
   ([ns-symbols]

@@ -14,6 +14,7 @@
   * Vars (created with `clojure.core/defn`) implement this protocol as an implementation detail
 * [BREAKING CHANGE] Now `dime.core/inject` is a fn and works with injectables only
 * [BREAKING CHANGE] Var-related API moved to `dime.var`
+* [BREAKING CHANGE] Now `dime.var/ns-vars->graph` picks vars having at least one inject annotation
 * A fn `dime.core/dependency-graph` to extract dependency-keys from a dependency graph
 
 
