@@ -61,17 +61,20 @@
 ;; ----- helpers -----
 
 (defn named-injectables->graph
-  "Given a map of names/id-keys (presumably inferred) to injectables, return a vector [implicit explicit] of
-  name/injectable maps for implicitly and explicitly inject-annotated injectables."
-  ([[implicit explicit] name-injectable-map]
-    (reduce (fn [[implicit explicit] [id-key injectable]]
+  "Given a map of names/id-keys (presumably inferred) to injectables, return a map of name/injectable pairs."
+  ([graph name-injectable-map]
+    (reduce (fn [graph [id-key injectable]]
               (expected t/injectable? "a valid injectable" injectable)
-              (if-let [inject-key (t/id-key injectable)]
-                [implicit (assoc explicit inject-key injectable)]
-                [(assoc implicit (keyword id-key) injectable) explicit]))
-      [implicit explicit] name-injectable-map))
+              (let [inject-key (or (t/id-key injectable)
+                                 (keyword id-key))]
+                (when (contains? graph inject-key)
+                  (throw (IllegalArgumentException.
+                           (format "Duplicate injectable %s found in the graph. Existing: %s, New: %s"
+                             inject-key (pr-str (get graph inject-key)) (pr-str injectable)))))
+                (assoc graph inject-key injectable)))
+      graph name-injectable-map))
   ([name-injectable-map]
-    (named-injectables->graph [{} {}] name-injectable-map)))
+    (named-injectables->graph {} name-injectable-map)))
 
 
 ;; ----- var helpers -----

@@ -18,10 +18,9 @@
 
 
 (deftest test-vars-inject
-  (let [di-graph (->> (dv/vars->graph [#'foo.db/make-conn-pool
-                                       #'foo.db/db-find-items
-                                       #'foo.db/db-create-order])
-                   (apply merge))
+  (let [di-graph (dv/vars->graph [#'foo.db/make-conn-pool
+                                  #'foo.db/db-find-items
+                                  #'foo.db/db-create-order])
         seed-map {:db-host "localhost"
                   :db-port 3306
                   :username "dbuser"
@@ -50,10 +49,9 @@
 
 
 (deftest test-ns-vars-inject
-  (let [di-graph (->> (dv/ns-vars->graph ['foo.web
-                                          'foo.service
-                                          'foo.db])
-                   (apply merge))
+  (let [di-graph (dv/ns-vars->graph ['foo.web
+                                     'foo.service
+                                     'foo.db])
         seed-map {:db-host "localhost"
                   :db-port 3306
                   :username "dbuser"

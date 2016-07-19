@@ -15,6 +15,7 @@
 * [BREAKING CHANGE] Now `dime.core/inject` is a fn and works with injectables only
 * [BREAKING CHANGE] Var-related API moved to `dime.var`
 * [BREAKING CHANGE] Now `dime.var/ns-vars->graph` picks vars having at least one inject annotation
+* [BREAKING CHANGE] Vars/injectables may not be implicit anymore - everything is explicit
 * A fn `dime.core/dependency-graph` to extract dependency-keys from a dependency graph
 
 

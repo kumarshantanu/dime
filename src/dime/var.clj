@@ -76,21 +76,21 @@
 
 
 (defn vars->graph
-  "Given a bunch of vars, return a vector [implicit explicit] of maps of keywordized-name/var pairs."
-  ([[implicit explicit] vars]
-    (i/named-injectables->graph [implicit explicit]
+  "Given a bunch of vars, return a map of keywordized-name/var pairs."
+  ([graph vars]
+    (i/named-injectables->graph graph
       (reduce (fn [m the-var]
                 (assoc m (:name (meta the-var)) the-var))
         {} vars)))
   ([vars]
-    (vars->graph [{} {}] vars)))
+    (vars->graph {} vars)))
 
 
 (defn ns-vars->graph
   "Given a bunch of namespace symbols, scan them for public vars that may be injected with dependencies and return a
-  map of keywordized-name/var pairs. Explicit inject names override/replace the implicit keywordized-names."
-  ([[implicit explicit] ns-symbols]
-    (reduce (fn [[implicit explicit] ns-sym]
+  map of keywordized-name/var pairs. Only public vars with at least one inject annotation are included."
+  ([graph ns-symbols]
+    (reduce (fn [graph ns-sym]
               (i/expected symbol? "a namespace symbol" ns-sym)
               (require ns-sym)
               (->> (ns-publics ns-sym)        ; select public vars only
@@ -101,7 +101,7 @@
                               (apply concat)
                               (some #(get (meta %) *inject-meta-key*))
                               (or (get dm *inject-meta-key*))))))
-                (i/named-injectables->graph [implicit explicit])))
-      [implicit explicit] ns-symbols))
+                (i/named-injectables->graph graph)))
+      graph ns-symbols))
   ([ns-symbols]
-    (ns-vars->graph [{} {}] ns-symbols)))
+    (ns-vars->graph {} ns-symbols)))
