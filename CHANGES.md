@@ -7,7 +7,7 @@
   * [TODO] Visibility control for injectables per context
 
 
-## 0.2.0 / 2016-July-??
+## 0.2.0 / 2016-July-19
 
 * A protocol called `dime.type/Injectable` for injectable types
   * Covers obtaining injection metadata and carrying out injection
@@ -16,7 +16,7 @@
 * [BREAKING CHANGE] Var-related API moved to `dime.var`
 * [BREAKING CHANGE] Now `dime.var/ns-vars->graph` picks vars having at least one inject annotation
 * [BREAKING CHANGE] Vars/injectables may not be implicit anymore - everything is explicit
-* A fn `dime.core/dependency-graph` to extract dependency-keys from a dependency graph
+* A fn `dime.core/dependency-graph` to extract dependency-keys from a dependency graph of injectables
 
 
 ## 0.1.0 / 2016-June-23

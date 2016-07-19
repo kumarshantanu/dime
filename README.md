@@ -5,18 +5,16 @@ Dependency Injection Made Easy for Clojure.
 Dime implements [dependency injection/inversion](https://en.wikipedia.org/wiki/Dependency_inversion_principle) by
 creating partially applied functions in an inexpensive (boiler-plate free), mostly automated manner.
 
-**(Disclaimer: Early days. Consider this alpha. Expect breaking changes across versions.)**
-
 
 ## Usage
 
-Leiningen coordinates: `[dime "0.1.0"]`
+Leiningen coordinates: `[dime "0.2.0"]`
 
 
 ### Example
 
 Consider a contrived order posting implementation with a decoupled design as shown below. You are supposed to write
-code in a similar fashion (with meta data tags) in your application for automatic injection.
+code in a similar fashion (with metadata tags) in your application for automatic injection.
 
 
 #### Annotated functions
@@ -50,7 +48,7 @@ Notice the meta data tags (`:inject`, `:post-inject`) used in the code.
 
 ;; ---------------- in namespace foo.web ----------------
 
-(defn find-user
+(defn ^:inject find-user  ; vars must have at least one inject annotation to participate in dependency discovery
   [session]
   :dummy-user)
 
@@ -63,23 +61,47 @@ Notice the meta data tags (`:inject`, `:post-inject`) used in the code.
 ```
 
 
-#### Dependency resolution
+#### Dependency discovery
 
-The code required to actually resolve and inject the dependencies is quite trivial.
+Discovering dependency graph is quite straightforward:
 
 ```clojure
-(require '[dime.core :as di])
+(ns foo.init
+  (:require
+    [dime.core :as di]
+    [dime.var  :as dv]))
 
-(let [deps (->> (di/ns-vars->graph ['foo.db 'foo.service 'foo.web]) ;; scan namespaces for vars to be injected
-             (apply merge))
-      seed {:db-host "localhost"
-            :db-port 3306
-            :username "dbuser"
-            :password "s3cr3t"}
-      ;; `inject-all` resolves/injects dependencies, returning keys associated with partial functions
-      {:keys [web-create-order]} (di/inject-all deps seed)]
-  ;; now `web-create-order` needs to be called with only `web-request`
-  ..)
+(def deps (dv/ns-vars->graph ['foo.db 'foo.service 'foo.web]))  ; scan namespaces for vars to be injected
+
+(defn deps-graph [] (di/dependency-graph deps))  ; this is only useful for visualization
+```
+
+
+#### Dependency resolution
+
+Prepare seed data and invoke dependency resolution:
+
+```clojure
+(defn resolve-dependencies
+  [...]
+  (let [seed {:db-host "localhost"
+              :db-port 3306
+              :username "dbuser"
+              :password "s3cr3t"}
+        ;; `inject-all` resolves/injects dependencies, returning keys associated with partial functions
+        {:keys [web-create-order]} (di/inject-all deps seed)]
+    ;; now `web-create-order` needs to be called with only `web-request`
+    ...))
+```
+
+
+#### Dependency graph visualization
+
+If you are using Leiningen, you can use the [lein-viz](https://github.com/kumarshantanu/lein-viz) plugin for
+visualization of the dependency graph. Install the plugin and run the following command to visualize the graph:
+
+```
+$ lein viz -t foo.init/deps-graph
 ```
 
 
