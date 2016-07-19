@@ -64,7 +64,7 @@
     (is (= [10 {:b 20 :d 40} 30 '(40)] (f-3 30 40)))))
 
 
-(deftest test-deps-all
+(deftest test-dependency-graph
   (let [f (fn [id ds] (reify t/Injectable
                         (valid?   [_] true)
                         (id-key   [_] id)
@@ -84,4 +84,4 @@
             :foo [:bar :baz]
             :bar [:x :y]
             :baz [:p :q]}
-          (di/deps-all g)))))
+          (di/dependency-graph g)))))

@@ -102,7 +102,7 @@
     (inject-all graph seed {})))
 
 
-(defn deps-all
+(defn dependency-graph
   "Given a map of name/injectable pairs, return a map of name/depdendency-keys pairs."
   [graph]
   (let [deps (reduce (fn [m [k injectable]]
