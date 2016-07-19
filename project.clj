@@ -15,4 +15,6 @@
                    :global-vars {*unchecked-math* :warn-on-boxed}}
              :c19 {:dependencies [[org.clojure/clojure "1.9.0-alpha10"]]
                    :global-vars {*unchecked-math* :warn-on-boxed}}
-             :dln {:jvm-opts ["-Dclojure.compiler.direct-linking=true"]}})
+             :dln {:jvm-opts ["-Dclojure.compiler.direct-linking=true"]}}
+  :plugins [[lein-viz "0.1.0"]]
+  :viz {:default foo.init/deps-graph})
