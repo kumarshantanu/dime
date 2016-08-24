@@ -6,7 +6,10 @@
   * Normal: `(dv/ns-vars->graph ['ns1 'ns2 'ns3])`, Override: `(dv/ns-vars->graph {'ns1 :web 'ns2 :biz 'ns3 :db})`
 * [TODO] Helper fn to effect the injectable as a post-inject step
 * [TODO] Annotate a var (args, inject, pre/post-inject) at runtime (3rd party code)
+* [TODO] Allow `display-name` as separate attribute from injectable ID
+  * Vars inherit their fully qualified name as the display name
 * [TODO] Integrate with `lein-viz` `0.2.0`
+  * Option to use display name vs ID as the node label
 * [TODO] Introduce injection contexts
   * [TODO] Identification mechanism for injectables per context
   * [TODO] Visibility control for injectables per context
