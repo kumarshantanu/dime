@@ -15,6 +15,13 @@
   * [TODO] Visibility control for injectables per context
 
 
+## 0.3.0-SNAPSHOT / 2016-September-??
+
+* Utility to
+  * Create injectables on the fly
+  * Associate injectables with their IDs in a map
+
+
 ## 0.2.0 / 2016-July-19
 
 * A protocol called `dime.type/Injectable` for injectable types

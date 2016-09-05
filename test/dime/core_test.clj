@@ -28,6 +28,19 @@
       (is (= (di-p :second :third) {:data [:first :second :third]})))))
 
 
+(def ten-times (di/inj ^{:inject :ten-multiplier} [^{:inject :multiplier} n] (* 10 n)))
+
+
+(deftest test-inj
+  (is (t/injectable? (di/inj [foo bar] [foo bar])))
+  (is (t/injectable? ten-times)))
+
+
+(deftest test-assoc-inj
+  (is (contains? (di/assoc-inj {} ten-times) :ten-multiplier))
+  (is (contains? (di/assoc-inj {} ten-times (di/inj ^{:inject :foo-bar} [foo bar] [foo bar])) :foo-bar)))
+
+
 (defn sample-0
   []
   :sample)
@@ -51,6 +64,7 @@
 
 
 (deftest test-inject
+  (is (= 150 (di/inject ten-times {:multiplier 15})))
   (let [f-0 (di/inject #'sample-0 {})
         f-1 (di/inject #'sample-1 {})
         f-2 (di/inject #'sample-2 {:a 10 :b 20})

@@ -22,6 +22,53 @@
      (apply ~f ~@args args#)))
 
 
+(defn inj*
+  "Given an injection option map, dependency-keys and an arity-2 function to carry out injection, return an injectable."
+  [{:keys [inject
+           pre-inject
+           post-inject]
+    :as options} dep-keys f]
+  (reify t/Injectable
+    (valid?   [_] true)
+    (id-key   [_] inject)
+    (dep-keys [_] dep-keys)
+    (inject   [_ deps pre] (f deps pre))
+    (pre-inject-fn  [_] pre-inject)
+    (post-inject-fn [_] post-inject)))
+
+
+(defmacro inj
+  "Given an annotated argument vector create an injectable using the body of code. Pre-inject argument is ignored."
+  [arg-vec & body]
+  (i/expected vector? "argument vector" arg-vec)
+  (let [deps-map (gensym "deps-map-")
+        dep-keys (->> arg-vec
+                   (map (fn [a] (or
+                                  (:inject (meta a))
+                                  (when (symbol? a)
+                                    (keyword a))
+                                  (i/expected "argument either annotated with :inject, or a symbol" a))))
+                   vec)
+        bindings (->> dep-keys
+                   (map (fn [k] `(if (contains? ~deps-map ~k)
+                                   (get ~deps-map ~k)
+                                   (i/expected (format "key '%s' in dependencies" ~k) (keys ~deps-map)))))
+                   (interleave arg-vec)
+                   vec)]
+    `(inj* ~(meta arg-vec) ~dep-keys (fn [~deps-map pre#]
+                                       (let ~bindings
+                                         ~@body)))))
+
+
+(defn assoc-inj
+  "Associate one or more injectables with their corresponding id-keys into a map."
+  ([m injectable]
+    (assoc m (t/id-key injectable) injectable))
+  ([m injectable & more]
+    (apply assoc m (t/id-key injectable) injectable
+      (mapcat (fn [i] [(t/id-key i) i]) more))))
+
+
 (defn process-pre-inject
   "Return the result of applying pre-inject fn to remaining args if pre-inject is non-nil, pre-injected injectable
   otherwise. Default pre-inject processor.
