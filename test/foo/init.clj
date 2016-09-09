@@ -20,4 +20,4 @@
 
 (defn deps-graph
   []
-  (di/dependency-graph graph))
+  {:graph (di/dependency-graph graph)})
