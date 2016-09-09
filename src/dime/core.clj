@@ -58,9 +58,15 @@
                                    (i/expected (format "key '%s' in dependencies" ~k) (keys ~deps-map)))))
                    (interleave arg-vec)
                    vec)]
-    `(inj* ~(meta arg-vec) ~dep-ids (fn [~deps-map pre#]
-                                      (let ~bindings
-                                        ~@body)))))
+    `(inj*
+       (let [call-meta# (i/whereami)]
+         (merge {:impl-id (format "%s, %s: %d"
+                            (:clj-varname call-meta#) (:file-name call-meta#) (:line-number call-meta#))}
+           ~(meta arg-vec)))
+       ~dep-ids
+       (fn [~deps-map pre#]
+         (let ~bindings
+           ~@body)))))
 
 
 (defn assoc-inj

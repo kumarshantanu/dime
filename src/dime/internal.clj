@@ -77,6 +77,24 @@
     (named-injectables->graph {} name-injectable-map)))
 
 
+(defmacro whereami
+  "Return a map of attributes pointing to the call-site. May be useful for debugging. Sample return value is below:
+  {:clj-varname \"foo.core/bar\",
+   :method-name \"invoke\",
+   :file-name   \"core.clj\",
+   :class-name  \"foo.core$bar\",
+   :line-number 21}"
+  []
+  `(let [e# (Exception.)
+         ^StackTraceElement ste# (aget (.getStackTrace e#) 0)]
+     ;; (.printStackTrace e#) ; uncomment this line to inspect stack trace
+     {:class-name  (.getClassName  ste#)
+      :file-name   (.getFileName   ste#)
+      :line-number (.getLineNumber ste#)
+      :method-name (.getMethodName ste#)
+      :clj-varname (.replace (.getClassName  ste#) \$ \/)}))
+
+
 ;; ----- var helpers -----
 
 
