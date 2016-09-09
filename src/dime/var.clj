@@ -10,7 +10,10 @@
 (ns dime.var
   (:require
     [dime.internal :as i]
-    [dime.type :as t]))
+    [dime.type :as t])
+  (:import
+    [clojure.lang Namespace]
+    [dime.type    InjectableAttributes]))
 
 
 (defn defn?
@@ -37,7 +40,7 @@
                           (t/map->InjectableAttributes
                             {:inj-id   (let [ik (get var-meta *inject-meta-key*)]
                                          (if (true? ik) (keyword (:name var-meta)) ik))
-                             :impl-id  (symbol (str (.getName (:ns var-meta)) \/ (:name var-meta)))
+                             :impl-id  (symbol (str (.getName ^Namespace (:ns var-meta)) \/ (:name var-meta)))
                              :dep-ids  (->> (:arglists var-meta)
                                          (map (partial i/inject-prepare *inject-meta-key* the-var))
                                          (mapcat first)
@@ -64,7 +67,7 @@
                              symbol)
                         ~@body-exp))]
       (try
-        (binding [i/*original-fn* (-> (.-pre-inj (t/iattrs the-var))
+        (binding [i/*original-fn* (-> (.-pre-inj ^InjectableAttributes (t/iattrs the-var))
                                     (pre the-var args))
                   i/*inject-args* args]
           (eval fn-maker))

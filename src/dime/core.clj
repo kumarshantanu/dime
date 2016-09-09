@@ -11,7 +11,9 @@
   (:refer-clojure :exclude [partial])
   (:require
     [dime.internal :as i]
-    [dime.type :as t]))
+    [dime.type :as t])
+  (:import
+    [dime.type InjectableAttributes]))
 
 
 (defmacro partial
@@ -73,12 +75,12 @@
   "Associate one or more injectables with their corresponding inj-IDs into a map."
   ([m injectable]
     (if (t/valid? injectable)
-      (assoc m (.-inj-id (t/iattrs injectable)) injectable)
+      (assoc m (.-inj-id ^InjectableAttributes (t/iattrs injectable)) injectable)
       m))
   ([m injectable & more]
     (->> (cons injectable more)
       (filter t/valid?)
-      (mapcat (fn [i] [(.-inj-id (t/iattrs i)) i]))
+      (mapcat (fn [i] [(.-inj-id ^InjectableAttributes (t/iattrs i)) i]))
       (apply assoc m))))
 
 
@@ -128,7 +130,7 @@
     (i/expected map? "a dependency graph as a map" graph)
     (i/expected map? "seed data to begin injection" seed)
     (reduce (fn inject-one [m [k injectable]]
-              (let [post-inject (fn [m p] (-> (.-post-inj (t/iattrs injectable))
+              (let [post-inject (fn [m p] (-> (.-post-inj ^InjectableAttributes (t/iattrs injectable))
                                             (post-inject-processor p k m)))
                     inject-deps (fn [m] (if (contains? m k)         ; avoid duplicate resolution
                                           m
@@ -136,7 +138,8 @@
                                             (inject injectable m)
                                             (post-inject m)
                                             (assoc m k))))]
-                (->> (.-dep-ids (t/iattrs injectable))              ; find dependencies of each injectable
+                (->> (.-dep-ids ^InjectableAttributes
+                                (t/iattrs injectable))              ; find dependencies of each injectable
                   (map (fn [each-dep-key]                           ; verify each dependency exists in seed/graph
                          (when-not (or (contains? seed each-dep-key)
                                      (contains? graph each-dep-key))
@@ -166,5 +169,5 @@
   "Given a map of name/injectable pairs, return a map of name/depdendency-keys pairs."
   [graph]
   (reduce (fn [m [k injectable]]
-            (assoc m k (vec (.-dep-ids (t/iattrs injectable)))))
+            (assoc m k (vec (.-dep-ids ^InjectableAttributes (t/iattrs injectable)))))
     {} graph))

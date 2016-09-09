@@ -10,7 +10,9 @@
 (ns dime.internal
   (:require
     [clojure.string :as string]
-    [dime.type :as t]))
+    [dime.type :as t])
+  (:import
+    [dime.type InjectableAttributes]))
 
 
 ;; ----- error reporting -----
@@ -65,7 +67,7 @@
   ([graph name-injectable-map]
     (reduce (fn [graph [inj-id injectable]]
               (expected t/injectable? "a valid injectable" injectable)
-              (let [inject-key (or (.-inj-id (t/iattrs injectable))
+              (let [inject-key (or (.-inj-id ^InjectableAttributes (t/iattrs injectable))
                                  (keyword inj-id))]
                 (when (contains? graph inject-key)
                   (throw (IllegalArgumentException.

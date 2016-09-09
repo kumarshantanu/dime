@@ -14,7 +14,8 @@
     [dime.type :as t]
     [foo.db])
   (:import
-    [clojure.lang ArityException]))
+    [clojure.lang ArityException]
+    [dime.type    InjectableAttributes]))
 
 
 (defn foo [a b c] [a b c])
@@ -88,7 +89,7 @@
                                                                   :post-inj nil}))
                         (inject   [_ deps pre] :injected)))
         g (reduce (fn [m x]
-                    (assoc m (.-inj-id (t/iattrs x)) x))
+                    (assoc m (.-inj-id ^InjectableAttributes (t/iattrs x)) x))
             {} [(f :foo [:bar :baz])
                 (f :bar [:x :y])
                 (f :baz [:p :q])
