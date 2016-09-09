@@ -11,12 +11,18 @@
 
 
 (defprotocol Injectable
-  (valid?   [_] "Return true if valid injectable, false otherwise.")
-  (id-key   [_] "Return identifier key of the injectable.")
-  (dep-keys [_] "Return all dependency keys of the injectable.")
-  (inject   [_ deps pre] "Inject dependencies and return partially applied injectable. `pre` is pre-process executor.")
-  (pre-inject-fn  [_] "Return arity-2 fn (injectable, deps) or nil for pre-inject processing.")
-  (post-inject-fn [_] "Return arity-3 (injected, id-key, deps) fn or nil for post-inject processing."))
+  (valid? [_] "Return true if valid injectable, false otherwise.")
+  (iattrs [_] "Return InjectableAttributes")
+  (inject [_ deps pre] "Inject dependencies and return partially applied injectable. `pre` is pre-process executor."))
+
+
+(defrecord InjectableAttributes
+  [inj-id   ; injection ID - dependency/role/artifact ID in a graph
+   impl-id  ; implementation ID - unique ID identifying the instance
+   dep-ids  ; dependency edge IDs
+   pre-inj  ; arity-2 fn (injectable, deps) or nil for pre-inject processing
+   post-inj ; arity-3 (injected, inj-id, deps) fn or nil for post-inject processing
+   ])
 
 
 (defn injectable?

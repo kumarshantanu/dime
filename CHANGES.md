@@ -17,6 +17,7 @@
 
 ## 0.3.0-SNAPSHOT / 2016-September-??
 
+* [BREAKING CHANGE] Protocol `dime.type/Injectable` now returns attributes as `dime.type/InjectableAttributes`
 * Utility to
   * Create injectables on the fly
   * Associate injectables with their IDs in a map

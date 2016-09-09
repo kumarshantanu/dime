@@ -32,17 +32,19 @@
 (extend-protocol t/Injectable
   clojure.lang.Var
   (valid?   [the-var] (defn? the-var))
-  (id-key   [the-var] (let [dm (meta the-var)
-                            ik (get dm *inject-meta-key*)]
-                        (if (true? ik)
-                          (keyword (:name dm))
-                          ik)))
-  (dep-keys [the-var] (->> (meta the-var)
-                        :arglists
-                        (map (partial i/inject-prepare *inject-meta-key* the-var))
-                        (mapcat first)
-                        (map :inject-key)
-                        distinct))
+  (iattrs   [the-var] (when (defn? the-var)
+                        (let [var-meta (meta the-var)]
+                          (t/map->InjectableAttributes
+                            {:inj-id   (let [ik (get var-meta *inject-meta-key*)]
+                                         (if (true? ik) (keyword (:name var-meta)) ik))
+                             :impl-id  (symbol (str (.getName (:ns var-meta)) \/ (:name var-meta)))
+                             :dep-ids  (->> (:arglists var-meta)
+                                         (map (partial i/inject-prepare *inject-meta-key* the-var))
+                                         (mapcat first)
+                                         (map :inject-key)
+                                         distinct)
+                             :pre-inj  (get var-meta *pre-inject-meta-key*)
+                             :post-inj (get var-meta *post-inject-meta-key*)}))))
   (inject   [the-var args pre]
     (i/expected defn? "a var created with clojure.core/defn" the-var)
     (i/expected map? "a map" args)
@@ -62,17 +64,13 @@
                              symbol)
                         ~@body-exp))]
       (try
-        (binding [i/*original-fn* (-> (t/pre-inject-fn the-var)
+        (binding [i/*original-fn* (-> (.-pre-inj (t/iattrs the-var))
                                     (pre the-var args))
                   i/*inject-args* args]
           (eval fn-maker))
         (catch ExceptionInInitializerError e  ; this may happen in Clojure 1.6 and below
           (throw (IllegalStateException.
-                   (format "Failed to evaluate partial-expr for %s: %s" the-var fn-maker) e))))))
-  (pre-inject-fn [the-var] (-> (meta the-var)
-                             (get *pre-inject-meta-key*)))
-  (post-inject-fn [the-var] (-> (meta the-var)
-                              (get *post-inject-meta-key*))))
+                   (format "Failed to evaluate partial-expr for %s: %s" the-var fn-maker) e)))))))
 
 
 (defn vars->graph

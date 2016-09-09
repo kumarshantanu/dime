@@ -25,16 +25,19 @@
 (defn inj*
   "Given an injection option map, dependency-keys and an arity-2 function to carry out injection, return an injectable."
   [{:keys [inject
+           impl-id
            pre-inject
            post-inject]
-    :as options} dep-keys f]
+    :or {impl-id (gensym "dime-generated/injectable-")}
+    :as options} dep-ids f]
   (reify t/Injectable
-    (valid?   [_] true)
-    (id-key   [_] inject)
-    (dep-keys [_] dep-keys)
-    (inject   [_ deps pre] (f deps pre))
-    (pre-inject-fn  [_] pre-inject)
-    (post-inject-fn [_] post-inject)))
+    (valid? [_] true)
+    (iattrs [_] (t/map->InjectableAttributes {:inj-id   inject
+                                              :impl-id  impl-id
+                                              :dep-ids  dep-ids
+                                              :pre-inj  pre-inject
+                                              :post-inj post-inject}))
+    (inject [_ deps pre] (f deps pre))))
 
 
 (defmacro inj
@@ -42,31 +45,35 @@
   [arg-vec & body]
   (i/expected vector? "argument vector" arg-vec)
   (let [deps-map (gensym "deps-map-")
-        dep-keys (->> arg-vec
+        dep-ids  (->> arg-vec
                    (map (fn [a] (or
                                   (:inject (meta a))
                                   (when (symbol? a)
                                     (keyword a))
                                   (i/expected "argument either annotated with :inject, or a symbol" a))))
                    vec)
-        bindings (->> dep-keys
+        bindings (->> dep-ids
                    (map (fn [k] `(if (contains? ~deps-map ~k)
                                    (get ~deps-map ~k)
                                    (i/expected (format "key '%s' in dependencies" ~k) (keys ~deps-map)))))
                    (interleave arg-vec)
                    vec)]
-    `(inj* ~(meta arg-vec) ~dep-keys (fn [~deps-map pre#]
-                                       (let ~bindings
-                                         ~@body)))))
+    `(inj* ~(meta arg-vec) ~dep-ids (fn [~deps-map pre#]
+                                      (let ~bindings
+                                        ~@body)))))
 
 
 (defn assoc-inj
-  "Associate one or more injectables with their corresponding id-keys into a map."
+  "Associate one or more injectables with their corresponding inj-IDs into a map."
   ([m injectable]
-    (assoc m (t/id-key injectable) injectable))
+    (if (t/valid? injectable)
+      (assoc m (.-inj-id (t/iattrs injectable)) injectable)
+      m))
   ([m injectable & more]
-    (apply assoc m (t/id-key injectable) injectable
-      (mapcat (fn [i] [(t/id-key i) i]) more))))
+    (->> (cons injectable more)
+      (filter t/valid?)
+      (mapcat (fn [i] [(.-inj-id (t/iattrs i)) i]))
+      (apply assoc m))))
 
 
 (defn process-pre-inject
@@ -115,7 +122,7 @@
     (i/expected map? "a dependency graph as a map" graph)
     (i/expected map? "seed data to begin injection" seed)
     (reduce (fn inject-one [m [k injectable]]
-              (let [post-inject (fn [m p] (-> (t/post-inject-fn injectable)
+              (let [post-inject (fn [m p] (-> (.-post-inj (t/iattrs injectable))
                                             (post-inject-processor p k m)))
                     inject-deps (fn [m] (if (contains? m k)         ; avoid duplicate resolution
                                           m
@@ -123,7 +130,7 @@
                                             (inject injectable m)
                                             (post-inject m)
                                             (assoc m k))))]
-                (->> (t/dep-keys injectable)                        ; find dependencies of each injectable
+                (->> (.-dep-ids (t/iattrs injectable))              ; find dependencies of each injectable
                   (map (fn [each-dep-key]                           ; verify each dependency exists in seed/graph
                          (when-not (or (contains? seed each-dep-key)
                                      (contains? graph each-dep-key))
@@ -153,5 +160,5 @@
   "Given a map of name/injectable pairs, return a map of name/depdendency-keys pairs."
   [graph]
   (reduce (fn [m [k injectable]]
-            (assoc m k (vec (t/dep-keys injectable))))
+            (assoc m k (vec (.-dep-ids (t/iattrs injectable)))))
     {} graph))
