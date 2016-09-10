@@ -117,7 +117,9 @@
    resolved    ; resolved map of seed + dependencies so far"
   [post-inject injected node-id resolved]
   (if post-inject
-    (post-inject injected node-id resolved)
+    (if (#{:effect :singleton} post-inject)
+      (injected)
+      (post-inject injected node-id resolved))
     injected))
 
 
