@@ -20,7 +20,6 @@
 
 (defn viz-payload
   []
-  (let [viz-graph (di/dependency-graph graph)]
-    {:graph-data  (di/attr-map graph :dep-ids)
-     :node-labels (di/attr-map graph :impl-id)
-     :node-shapes (di/attr-map graph #(when (:post-inj %) :rectangle))}))
+  {:graph-data  (di/attr-map graph :dep-ids)
+   :node-labels (di/attr-map graph :impl-id)
+   :node-shapes (di/attr-map graph #(when (:post-inj %) :rectangle))})

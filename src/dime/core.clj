@@ -171,11 +171,3 @@
   (reduce (fn [m [k injectable]]
             (assoc m k (f (t/iattrs injectable))))
     {} graph))
-
-
-(defn dependency-graph
-  "Given a map of name/injectable pairs, return a map of name/depdendency-keys pairs."
-  [graph]
-  (reduce (fn [m [k injectable]]
-            (assoc m k (vec (.-dep-ids ^InjectableAttributes (t/iattrs injectable)))))
-    {} graph))

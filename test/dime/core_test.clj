@@ -79,7 +79,7 @@
     (is (= [10 {:b 20 :d 40} 30 '(40)] (f-3 30 40)))))
 
 
-(deftest test-dependency-graph
+(deftest test-attr-map
   (let [f (fn [id ds] (reify t/Injectable
                         (valid? [_] true)
                         (iattrs [_] (t/map->InjectableAttributes {:inj-id  id
@@ -98,4 +98,4 @@
             :bar [:x :y]
             :baz [:p :q]
             :qux []}
-          (di/dependency-graph g)))))
+          (di/attr-map g :dep-ids)))))

@@ -16,6 +16,7 @@
 * [BREAKING CHANGE] Protocol `dime.type/Injectable` now returns attributes as `dime.type/InjectableAttributes`
   * Attribute `id-key` renamed to `inj-id` (to uniquely represent the node in a graph)
   * New attribute: `:impl-id` to uniquely represent the injectable implementation
+* [BREAKING CHANGE] Function `dime.core/dependency-graph` dropped in favor of new function `dime.core/attr-map`
 * Integration demo with `[lein-viz "0.3.0-SNAPSHOT"]` (WIP)
   * Node name to be borrowed from impl-ID instead of node-ID
   * Node shape dictated by `:post-inj` attribute (non-nil implies singleton)
