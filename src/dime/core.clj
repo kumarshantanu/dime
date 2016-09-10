@@ -34,7 +34,7 @@
     :as options} dep-ids f]
   (reify t/Injectable
     (valid? [_] true)
-    (iattrs [_] (t/map->InjectableAttributes {:inj-id   inject
+    (iattrs [_] (t/map->InjectableAttributes {:node-id  inject
                                               :impl-id  impl-id
                                               :dep-ids  dep-ids
                                               :pre-inj  pre-inject
@@ -72,15 +72,15 @@
 
 
 (defn assoc-inj
-  "Associate one or more injectables with their corresponding inj-IDs into a map."
+  "Associate one or more injectables with their corresponding node-IDs into a map."
   ([m injectable]
     (if (t/valid? injectable)
-      (assoc m (.-inj-id ^InjectableAttributes (t/iattrs injectable)) injectable)
+      (assoc m (.-node-id ^InjectableAttributes (t/iattrs injectable)) injectable)
       m))
   ([m injectable & more]
     (->> (cons injectable more)
       (filter t/valid?)
-      (mapcat (fn [i] [(.-inj-id ^InjectableAttributes (t/iattrs i)) i]))
+      (mapcat (fn [i] [(.-node-id ^InjectableAttributes (t/iattrs i)) i]))
       (apply assoc m))))
 
 
@@ -113,17 +113,17 @@
   Arguments:
    post-inject ; post-inject fn
    injected    ; the partial fn created from the injectable
-   inject-key  ; inject key for the injectable
+   node-ID     ; node ID for the injectable
    resolved    ; resolved map of seed + dependencies so far"
-  [post-inject injected inject-key resolved]
+  [post-inject injected node-id resolved]
   (if post-inject
-    (post-inject injected inject-key resolved)
+    (post-inject injected node-id resolved)
     injected))
 
 
 (defn inject-all
-  "Given a map of name/injectable pairs and seed data map, resolve/inject all dependencies and return a map of
-  name/partially-applied-function pairs."
+  "Given a map of node-ID/injectable pairs and seed data map, resolve/inject all dependencies and return a map of
+  node-ID/partially-applied-function pairs."
   ([graph seed {:keys [post-inject-processor]
                 :or {post-inject-processor process-post-inject}
                 :as options}]

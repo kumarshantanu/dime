@@ -63,12 +63,12 @@
 ;; ----- helpers -----
 
 (defn named-injectables->graph
-  "Given a map of names/inj-IDs (presumably inferred) to injectables, return a map of name/injectable pairs."
+  "Given a map of node-IDs (presumably inferred) to injectables, return a map of node-ID/injectable pairs."
   ([graph name-injectable-map]
-    (reduce (fn [graph [inj-id injectable]]
+    (reduce (fn [graph [node-id injectable]]
               (expected t/injectable? "a valid injectable" injectable)
-              (let [inject-key (or (.-inj-id ^InjectableAttributes (t/iattrs injectable))
-                                 (keyword inj-id))]
+              (let [inject-key (or (.-node-id ^InjectableAttributes (t/iattrs injectable))
+                                 (keyword node-id))]
                 (when (contains? graph inject-key)
                   (throw (IllegalArgumentException.
                            (format "Duplicate injectable %s found in the graph. Existing: %s, New: %s"

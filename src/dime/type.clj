@@ -17,11 +17,11 @@
 
 
 (defrecord InjectableAttributes
-  [inj-id   ; injection ID - dependency/role/artifact ID in a graph
-   impl-id  ; implementation ID - unique ID identifying the instance
+  [node-id  ; node ID - unique role/artifact ID in a graph
+   impl-id  ; implementation ID - unique instance identifier
    dep-ids  ; dependency edge IDs
    pre-inj  ; arity-2 fn (injectable, deps) or nil for pre-inject processing
-   post-inj ; arity-3 (injected, inj-id, deps) fn or nil for post-inject processing
+   post-inj ; arity-3 (injected, node-id, deps) fn or nil for post-inject processing
    ])
 
 

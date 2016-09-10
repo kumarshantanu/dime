@@ -38,7 +38,7 @@
   (iattrs   [the-var] (when (defn? the-var)
                         (let [var-meta (meta the-var)]
                           (t/map->InjectableAttributes
-                            {:inj-id   (let [ik (get var-meta *inject-meta-key*)]
+                            {:node-id  (let [ik (get var-meta *inject-meta-key*)]
                                          (if (true? ik) (keyword (:name var-meta)) ik))
                              :impl-id  (symbol (str (.getName ^Namespace (:ns var-meta)) \/ (:name var-meta)))
                              :dep-ids  (->> (:arglists var-meta)

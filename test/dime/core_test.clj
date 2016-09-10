@@ -82,14 +82,14 @@
 (deftest test-attr-map
   (let [f (fn [id ds] (reify t/Injectable
                         (valid? [_] true)
-                        (iattrs [_] (t/map->InjectableAttributes {:inj-id  id
+                        (iattrs [_] (t/map->InjectableAttributes {:node-id  id
                                                                   :impl-id  (gensym)
                                                                   :dep-ids  ds
                                                                   :pre-inj  nil
                                                                   :post-inj nil}))
                         (inject   [_ deps pre] :injected)))
         g (reduce (fn [m x]
-                    (assoc m (.-inj-id ^InjectableAttributes (t/iattrs x)) x))
+                    (assoc m (.-node-id ^InjectableAttributes (t/iattrs x)) x))
             {} [(f :foo [:bar :baz])
                 (f :bar [:x :y])
                 (f :baz [:p :q])
