@@ -6,7 +6,6 @@
   * Normal: `(dv/ns-vars->graph ['ns1 'ns2 'ns3])`, Override: `(dv/ns-vars->graph {'ns1 :web 'ns2 :biz 'ns3 :db})`
 * [TODO] Helper fn to effect the injectable as a post-inject step
 * [TODO] Annotate a var (args, inject, pre/post-inject) at runtime (3rd party code)
-* [TODO] lein-viz 0.2.0 integration: Option to use display name vs ID as the node label
 * [TODO] Introduce injection contexts
   * [TODO] Identification mechanism for injectables per context
   * [TODO] Visibility control for injectables per context
@@ -15,7 +14,11 @@
 ## 0.3.0-SNAPSHOT / 2016-September-??
 
 * [BREAKING CHANGE] Protocol `dime.type/Injectable` now returns attributes as `dime.type/InjectableAttributes`
-* Integration with `lein-viz` `0.2.1`
+  * Attribute `id-key` renamed to `inj-id` (to uniquely represent the node in a graph)
+  * New attribute: `:impl-id` to uniquely represent the injectable implementation
+* Integration demo with `[lein-viz "0.3.0-SNAPSHOT"]` (WIP)
+  * Node name to be borrowed from impl-ID instead of node-ID
+  * Node shape dictated by `:post-inj` attribute (non-nil implies singleton)
 * Utility to
   * Create injectables on the fly
   * Associate injectables with their IDs in a map

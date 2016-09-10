@@ -165,6 +165,14 @@
     (inject-all graph seed {})))
 
 
+(defn attr-map
+  "Given a map of node-IDs to injectables, return a map of node-IDs to f (arity-1 fn) applied to injectable attributes."
+  [graph f]
+  (reduce (fn [m [k injectable]]
+            (assoc m k (f (t/iattrs injectable))))
+    {} graph))
+
+
 (defn dependency-graph
   "Given a map of name/injectable pairs, return a map of name/depdendency-keys pairs."
   [graph]

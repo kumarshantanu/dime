@@ -16,5 +16,5 @@
              :c19 {:dependencies [[org.clojure/clojure "1.9.0-alpha12"]]
                    :global-vars {*unchecked-math* :warn-on-boxed}}
              :dln {:jvm-opts ["-Dclojure.compiler.direct-linking=true"]}}
-  :plugins [[lein-viz "0.2.1"]]
-  :viz {:default {:source foo.init/deps-graph}})
+  :plugins [[lein-viz "0.3.0-SNAPSHOT"]]
+  :viz {:default {:source foo.init/viz-payload}})
