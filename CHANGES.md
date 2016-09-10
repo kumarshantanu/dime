@@ -4,7 +4,6 @@
 
 * [TODO] Auto-namespace the injectable names by specifying a map instead of a vector to `dime.var/ns-vars->graph`:
   * Normal: `(dv/ns-vars->graph ['ns1 'ns2 'ns3])`, Override: `(dv/ns-vars->graph {'ns1 :web 'ns2 :biz 'ns3 :db})`
-* [TODO] Helper fn to effect the injectable as a post-inject step
 * [TODO] Annotate a var (args, inject, pre/post-inject) at runtime (3rd party code)
 * [TODO] Introduce injection contexts
   * [TODO] Identification mechanism for injectables per context
