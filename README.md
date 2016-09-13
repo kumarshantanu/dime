@@ -8,7 +8,7 @@ creating partially applied functions in an inexpensive (boiler-plate free), most
 
 ## Usage
 
-Leiningen coordinates: `[dime "0.2.0"]`
+Leiningen coordinates: `[dime "0.3.0"]`
 
 
 ### Example
@@ -25,7 +25,7 @@ Notice the meta data tags (`:inject`, `:post-inject`) used in the code.
 ;; ---------------- in namespace foo.db ----------------
 
 (defn ^{:inject :connection-pool
-        :post-inject (fn [f k m] (f))}  ; custom processing: execute the fn to obtain connection-pool
+        :post-inject (fn [f k m] (f))}  ; execute fn to obtain connection-pool, same as `:post-inject :singleton`
       make-conn-pool
   [^:inject db-host ^:inject db-port ^:inject username ^:inject password]
   :dummy-pool)
@@ -61,19 +61,24 @@ Notice the meta data tags (`:inject`, `:post-inject`) used in the code.
 ```
 
 
-#### Dependency discovery
+#### Requiring namespaces
 
-Discovering dependency graph is quite straightforward:
+You would need the requires namespaces. See the snippet below:
 
 ```clojure
 (ns foo.init
   (:require
     [dime.core :as di]
     [dime.var  :as dv]))
+```
 
-(def deps (dv/ns-vars->graph ['foo.db 'foo.service 'foo.web]))  ; scan namespaces for vars to be injected
 
-(defn deps-graph [] (di/dependency-graph deps))  ; this is only useful for visualization
+#### Dependency discovery
+
+Discovering dependency graph is quite straightforward:
+
+```clojure
+(def deps (dv/ns-vars->graph ['foo.db 'foo.service 'foo.web]))  ; scan namespaces for injectable vars
 ```
 
 
@@ -98,10 +103,21 @@ Prepare seed data and invoke dependency resolution:
 #### Dependency graph visualization
 
 If you are using Leiningen, you can use the [lein-viz](https://github.com/kumarshantanu/lein-viz) plugin for
-visualization of the dependency graph. Install the plugin and run the following command to visualize the graph:
+visualization of the dependency graph. The snippet below is an example for `[lein-viz 0.3.0]`:
+
+```clojure
+;; assuming this is in foo.init namespace
+(defn viz-payload
+  []
+  {:graph-data  (di/attr-map graph :dep-ids)
+   :node-labels (di/attr-map graph :impl-id)
+   :node-shapes (di/attr-map graph #(when (:post-inj %) :rectangle))})
+```
+
+Install the plugin and run the following command to visualize the graph:
 
 ```
-$ lein viz -t foo.init/deps-graph
+$ lein viz -s foo.init/viz-payload
 ```
 
 

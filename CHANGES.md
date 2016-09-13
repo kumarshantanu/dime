@@ -8,7 +8,7 @@
   * [TODO] Visibility control for injectables per context
 
 
-## 0.3.0-SNAPSHOT / 2016-September-??
+## 0.3.0 / 2016-September-13
 
 * [BREAKING CHANGE] Protocol `dime.type/Injectable` now returns attributes as `dime.type/InjectableAttributes`
   * Attribute `id-key` renamed to `node-id` (to uniquely represent the node in a graph)
