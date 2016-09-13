@@ -66,12 +66,12 @@
 
 (deftest test-inject
   (is (= 150 (di/inject ten-times {:multiplier 15})))
-  (let [f-0 (di/inject #'sample-0 {})
-        f-1 (di/inject #'sample-1 {})
-        f-2 (di/inject #'sample-2 {:a 10 :b 20})
+  (is (thrown? IllegalArgumentException
+        (di/inject #'sample-0 {})))
+  (is (thrown? IllegalArgumentException
+        (di/inject #'sample-1 {})))
+  (let [f-2 (di/inject #'sample-2 {:a 10 :b 20})
         f-3 (di/inject #'sample-3 {:a 10 :b {:b 20 :d 40}})]
-    (is (= :sample (f-0)))
-    (is (= [10 20] (f-1 10 20)))
     (is (= [10 20] (f-2)))
     (is (thrown? ArityException (f-2 30)))
     (is (thrown? ArityException (f-3)))

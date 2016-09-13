@@ -102,7 +102,9 @@
   ([injectable deps {:keys [pre-inject-processor]
                      :or {pre-inject-processor process-pre-inject}
                      :as options}]
-    (t/inject injectable deps pre-inject-processor))
+    (if (t/valid? injectable)
+      (t/inject injectable deps pre-inject-processor)
+      (throw (IllegalArgumentException. (str "Not a valid injectable: " injectable)))))
   ([injectable deps]
     (inject injectable deps {})))
 
