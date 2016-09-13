@@ -29,7 +29,7 @@
       (is (= (di-p :second :third) {:data [:first :second :third]})))))
 
 
-(def ten-times (di/inj ^{:inject :ten-multiplier} [^{:inject :multiplier} n] (* 10 n)))
+(def ten-times (di/inj ^{:inject :ten-multiplier} [^{:inject :multiplier} n] (* 10 ^long n)))
 
 
 (deftest test-inj
