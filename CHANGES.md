@@ -17,7 +17,7 @@
   * Normal: `(dv/ns-vars->graph ['ns1 'ns2 'ns3])`, Override: `(dv/ns-vars->graph {'ns1 :web 'ns2 :biz 'ns3 :db})`
 * The `:post-inject` annotation `:singleton` is now considered as `(fn [f k m] (f))`
 * [BREAKING CHANGE] Function `dime.core/dependency-graph` dropped in favor of new function `dime.core/attr-map`
-* Integration demo with `[lein-viz "0.3.0-SNAPSHOT"]` (WIP)
+* Integration demo with `[lein-viz "0.3.0"]`
   * Node name to be borrowed from impl-ID instead of node-ID
   * Node shape dictated by `:post-inj` attribute (non-nil implies singleton)
 * Utility to
