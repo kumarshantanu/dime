@@ -16,7 +16,7 @@
   :mock-items)
 
 
-(defn service-create-order
+(defn ^{:inject :svc/create-order} service-create-order
   [^:inject find-items ^:inject db-create-order user-details order-details]
   (let [item-ids   (find-items (:item-ids order-details))
         order-data {:order-data :dummy}]  ; prepare order-data

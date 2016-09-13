@@ -16,7 +16,7 @@
 
 
 (defn web-create-order
-  [^:inject find-user ^:inject service-create-order web-request]
+  [^:inject find-user ^{:inject :svc/create-order} service-create-order web-request]
   (let [user-details (find-user (:session web-request))
         order-details {:order :dummy-order}
         created-order (service-create-order user-details order-details)]

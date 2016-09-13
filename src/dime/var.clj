@@ -44,7 +44,7 @@
                         (let [var-meta (meta the-var)]
                           (t/map->InjectableAttributes
                             {:node-id  (let [ik (get var-meta *inject-meta-key*)]
-                                         (if (true? ik) (keyword (:name var-meta)) ik))
+                                         (if (or (true? ik) (nil? ik)) (keyword (:name var-meta)) ik))
                              :impl-id  (symbol (str (.getName ^Namespace (:ns var-meta)) \/ (:name var-meta)))
                              :dep-ids  (->> (:arglists var-meta)
                                          (map (partial i/inject-prepare *inject-meta-key* the-var))
@@ -96,12 +96,39 @@
   "Given a bunch of namespace symbols, scan them for public vars that may be injected with dependencies and return a
   map of keywordized-name/var pairs. Only public vars with at least one inject annotation are included."
   ([graph ns-symbols]
-    (reduce (fn [graph ns-sym]
-              (i/expected symbol? "a namespace symbol" ns-sym)
-              (require ns-sym)
-              (->> (ns-publics ns-sym)          ; select public vars only
-                (filter #(t/valid? (second %))) ; select valid injectable vars only
-                (i/named-injectables->graph graph)))
-      graph ns-symbols))
+    (let [as-nameonly-str (fn [x]
+                            (if (instance? clojure.lang.Named x)
+                              (name x)
+                              (str x)))
+          as-var-kv-entry (fn [wrapper graph ns-sym]
+                            (i/expected symbol? "a namespace symbol" ns-sym)
+                            (require ns-sym)
+                            (->> (ns-publics ns-sym)          ; select public vars only
+                              (filter #(t/valid? (second %))) ; select valid injectable vars only
+                              (map (fn [[k v]] [k (wrapper ns-sym v)]))
+                              (i/named-injectables->graph graph)))
+          qualify-node-id (fn [ns-sym the-var]
+                            (reify t/Injectable
+                              (valid? [_]
+                                (t/valid? the-var))
+                              (iattrs [_]
+                                (when-let [attrs (t/iattrs the-var)]
+                                  (update-in attrs [:node-id]
+                                    (fn [node-id]
+                                      (if (or (and (instance? clojure.lang.Named node-id) (namespace node-id))
+                                            (and (string? node-id) (pos? (.indexOf ^String node-id (int \/)))))
+                                        node-id
+                                        (if-let [default-ns (get ns-symbols ns-sym)]
+                                          (cond  ; attempt to qualify only keyword/symbol/string node-IDs
+                                            (keyword? node-id) (keyword (as-nameonly-str default-ns) (name node-id))
+                                            (symbol?  node-id) (symbol  (as-nameonly-str default-ns) (name node-id))
+                                            (string?  node-id) (str (as-nameonly-str default-ns) \/ node-id)
+                                            :otherwise         node-id)
+                                          node-id))))))
+                              (inject [_ deps pre]
+                                (t/inject the-var deps pre))))]
+      (if (map? ns-symbols)
+       (reduce (partial as-var-kv-entry qualify-node-id) graph (keys ns-symbols))
+       (reduce (partial as-var-kv-entry (fn [k iv] iv))  graph ns-symbols))))
   ([ns-symbols]
     (ns-vars->graph {} ns-symbols)))

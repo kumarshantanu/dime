@@ -62,8 +62,8 @@
             {:keys [connection-pool
                     db-create-order
                     find-items
-                    service-create-order
-                    web-create-order]} injected]
+                    web-create-order]} injected
+            service-create-order (:svc/create-order injected)]
         (is (= 1 @foo.db/init-count) "Initialization must happen exactly once")
         (is (= :dummy-pool                 connection-pool))
         (is (= {:items :dummy}             (find-items :dummy)))
@@ -84,3 +84,14 @@
         (is (= 1 @foo.db/init-count) "Initialization must happen exactly once")
         (with-redefs [foo.db/db-create-order (constantly :foo)]
           (is (= {:created-order :dummy} (db-create-order :dummy)) "Var must be dissociated with partial"))))))
+
+
+(deftest test-ns-vars-auto-qualify
+  (let [di-graph (dv/ns-vars->graph {'foo.web     :web
+                                     'foo.service :service
+                                     'foo.db      :db})
+        di-keys (set (keys di-graph))]
+    (is (contains? di-keys :web/find-user)        "auto-qualified hinted (true) node-ID")
+    (is (contains? di-keys :web/web-create-order) "auto-qualified inferred node-ID")
+    (is (contains? di-keys :db/connection-pool)   "auto-qualified custom node-ID")
+    (is (contains? di-keys :svc/create-order)     "qualified node-ID not auto-qualified")))
