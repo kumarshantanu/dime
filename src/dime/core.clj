@@ -127,7 +127,7 @@
 
 (defn inject-all
   "Given a map of node-ID/injectable pairs and seed data map, resolve/inject all dependencies and return a map of
-  node-ID/partially-applied-function pairs."
+  node-ID/injected pairs."
   ([graph seed {:keys [post-inject-processor]
                 :or {post-inject-processor process-post-inject}
                 :as options}]
