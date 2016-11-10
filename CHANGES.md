@@ -10,9 +10,9 @@
 
 ## 0.4.0 / 2016-November-??
 
-* [TODO] Injection support in destructuring argument expressions for vars
-  * [TODO] Sequential destructuring (vector arguments)
-  * [TODO] Associative destructuring (map arguments)
+* Injection support in destructuring argument expressions for vars
+  * Sequential destructuring (vector literal)
+  * Associative destructuring (map literal)
 * [TODO] Support for defining efficient custom injectable types
 * [TODO] Support for creating injectable alias for pre-defined vars
 

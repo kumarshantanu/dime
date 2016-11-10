@@ -106,33 +106,57 @@
 (def ^:dynamic *inject-args* nil)
 
 
+(defn arg-info
+  "Return a map of argument info. Helper for `inject-prepare`."
+  [inject-meta-key arg]
+  (let [info-map (fn [injector-fn inject-keys]
+                   {:arg arg
+                    :sym (gensym (if injector-fn "inject-" "arg-"))
+                    :injector-fn injector-fn  ; non-nil injector-fn implies injectable dependency
+                    :inject-keys inject-keys})
+        no-infer (fn [a] (throw (ex-info (str "Cannot infer inject key for argument " (pr-str a))
+                                  {:argument a})))]
+    (if-let [inject-tag (get (meta arg) inject-meta-key)]
+      (if (true? inject-tag)
+        (cond
+          (symbol? arg)       (info-map (fn [ks vs] (first vs)) [(keyword arg)])
+          (and (vector? arg)) (->> (take-while (complement #{'& :as}) arg)
+                                (map (fn [param]
+                                       (let [inject-name (get (meta param) inject-meta-key)]
+                                         (expected (comp not false?) "non-false :inject tag"
+                                           inject-name)
+                                         (if (and inject-name (not (true? inject-name)))
+                                           inject-name
+                                           (if (symbol? param)
+                                             (keyword param)
+                                             (no-infer param))))))
+                                (info-map (fn [ks vs] (vec vs))))
+          (and (map? arg))    (->> (seq arg)
+                                (filter (comp not keyword? first))
+                                (map second)
+                                (concat (map keyword (:keys arg)))
+                                (concat (map symbol (:syms arg)))
+                                (concat (map str (:strs arg)))
+                                (info-map zipmap))
+          :otherwise          (no-infer arg))
+        (info-map (fn [ks vs] (first vs)) [inject-tag]))
+      (info-map nil nil))))
+
+
 (defn inject-prepare
   "Given a defn var-name and arglist return a vector [inject-args fn-body] where inject-args is a collection of
   dependencies (each of them represented as a map) and fn-body is the body expression for partial fn."
   [inject-meta-key name-sym arglist]
   (let [var-args?   (some #(= % '&) arglist)
         var-argsym  (when var-args? (gensym "more-"))
-        arg-info    (fn [idx arg]
-                      (let [inject-key (when-let [inject-name (get (meta arg) inject-meta-key)]
-                                         (if (true? inject-name)
-                                           (if (symbol? arg)
-                                             (keyword arg)
-                                             (throw (ex-info (str "Cannot infer inject key for argument " (pr-str arg))
-                                                      {:argument arg})))
-                                           inject-name))]
-                        {:arg   arg
-                         :index idx
-                         :sym   (gensym (if inject-key "inject-" "arg-"))
-                         ;; non nil inject-key implies injectable dependency
-                         :inject-key inject-key}))
         fixed-args  (->> arglist
                       (take-while #(not= % '&))   ; fixed args only
-                      (map-indexed arg-info)
+                      (map (partial arg-info inject-meta-key))
                       vec)
         inject-args (->> fixed-args
-                      (filter :inject-key))
+                      (filter :injector-fn))
         expose-syms (as-> fixed-args $
-                      (remove :inject-key $)
+                      (remove :injector-fn $)
                       (mapv :sym $)
                       (concat $ (when var-args? ['& var-argsym]))
                       (vec $))

@@ -49,7 +49,7 @@
                              :dep-ids  (->> (:arglists var-meta)
                                          (map (partial i/inject-prepare *inject-meta-key* the-var))
                                          (mapcat first)
-                                         (map :inject-key)
+                                         (mapcat :inject-keys)  ; populated in internal.clj
                                          distinct)
                              :pre-inj  (get var-meta *pre-inject-meta-key*)
                              :post-inj (get var-meta *post-inject-meta-key*)}))))
@@ -62,8 +62,11 @@
                      (map (partial i/inject-prepare *inject-meta-key* name-sym)))
           bindings (->> prepared
                      (mapcat first)
-                     (mapcat (fn [{:keys [sym inject-key]}]
-                               [sym `(i/get-val i/*inject-args* ~inject-key)])))
+                     (mapcat (fn [{:keys [sym injector-fn inject-keys]}]  ; populated in internal.clj
+                               [sym `(let [iks# ~(vec inject-keys)]
+                                       (->> iks#
+                                         (mapv #(i/get-val i/*inject-args* %))
+                                         (~injector-fn iks#)))])))
           body-exp (map second prepared)
           fn-maker `(let [~name-sym i/*original-fn*
                           ~@bindings]
