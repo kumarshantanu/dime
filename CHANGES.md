@@ -8,6 +8,15 @@
   * [TODO] Visibility control for injectables per context
 
 
+## 0.4.0 / 2016-November-??
+
+* [TODO] Injection support in destructuring argument expressions for vars
+  * [TODO] Sequential destructuring (vector arguments)
+  * [TODO] Associative destructuring (map arguments)
+* [TODO] Support for defining efficient custom injectable types
+* [TODO] Support for creating injectable alias for pre-defined vars
+
+
 ## 0.3.0 / 2016-September-13
 
 * [BREAKING CHANGE] Protocol `dime.type/Injectable` now returns attributes as `dime.type/InjectableAttributes`
