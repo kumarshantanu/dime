@@ -13,8 +13,17 @@
 * Injection support in destructuring argument expressions for vars
   * Sequential destructuring (vector literal)
   * Associative destructuring (map literal)
+* Var internals
+  * [TODO] Vars can override how to inject by specifying `:inject-with` metadata
+  * [TODO] Move var metadata attribute names (dynamic vars) to `dime.util` namespace
 * [TODO] Support for defining efficient custom injectable types
-* [TODO] Support for creating injectable alias for pre-defined vars
+  * [TODO] Discoverable as a var
+* Support for pre-defined vars
+  * [TODO] Create injectable alias
+  * [TODO] Update var metadata with injection info
+* Post-inject support
+  * [TODO - BREAKING CHANGE] Drop special `:post-inject` annotation `:singleton` (because not composable)
+  * [TODO] Utility fn `dime.util/post-inject-invoke` to invoke the injected as arity-0 fn
 
 
 ## 0.3.0 / 2016-September-13
