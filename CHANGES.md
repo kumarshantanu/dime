@@ -22,7 +22,7 @@
   * [BREAKING CHANGE] Drop support for special `:post-inject` annotation `:singleton` (because not composable)
 * Var injectables
   * [TODO] Vars can override how to inject by specifying `:inject-with` metadata
-  * [TODO] Use `dime.util` fns for var metadata attribute names
+  * Use attribute names in `dime.util` for reading var metadata
   * [TODO] Support for creating injectable alias to pre-existing ordinary vars
   * [TODO] Support for updating pre-existing var metadata with injection info
 * Non-var injectables
