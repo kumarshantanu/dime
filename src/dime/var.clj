@@ -10,7 +10,8 @@
 (ns dime.var
   (:require
     [dime.internal :as i]
-    [dime.type :as t])
+    [dime.type :as t]
+    [dime.util :as u])
   (:import
     [clojure.lang Namespace]
     [dime.type    InjectableAttributes]))
@@ -23,43 +24,34 @@
     (contains? (meta df) :arglists)))
 
 
-(def ^:dynamic *inject-meta-key* :inject)
-
-
-(def ^:dynamic *pre-inject-meta-key* :pre-inject)
-
-
-(def ^:dynamic *post-inject-meta-key* :post-inject)
-
-
 (extend-protocol t/Injectable
   clojure.lang.Var
   (valid?   [the-var] (and (defn? the-var)             ; created with defn?
                         (let [var-meta (meta the-var)] ; has at least one injection annotation?
                           (->> (:arglists var-meta)
                             (apply concat)
-                            (some #(get (meta %) *inject-meta-key*))
-                            (or (get var-meta *inject-meta-key*))))))
+                            (some #(get (meta %) u/*inject-meta-key*))
+                            (or (get var-meta u/*inject-meta-key*))))))
   (iattrs   [the-var] (when (t/valid? the-var)
                         (let [var-meta (meta the-var)]
                           (t/map->InjectableAttributes
-                            {:node-id  (let [ik (get var-meta *inject-meta-key*)]
+                            {:node-id  (let [ik (get var-meta u/*inject-meta-key*)]
                                          (if (or (true? ik) (nil? ik)) (keyword (:name var-meta)) ik))
                              :impl-id  (symbol (str (.getName ^Namespace (:ns var-meta)) \/ (:name var-meta)))
                              :dep-ids  (->> (:arglists var-meta)
-                                         (map (partial i/inject-prepare *inject-meta-key* the-var))
+                                         (map (partial i/inject-prepare u/*inject-meta-key* the-var))
                                          (mapcat first)
                                          (mapcat :inject-keys)  ; populated in internal.clj
                                          distinct)
-                             :pre-inj  (get var-meta *pre-inject-meta-key*)
-                             :post-inj (get var-meta *post-inject-meta-key*)}))))
+                             :pre-inj  (get var-meta u/*pre-inject-meta-key*)
+                             :post-inj (get var-meta u/*post-inject-meta-key*)}))))
   (inject   [the-var args pre]
     (i/expected defn? "a var created with clojure.core/defn" the-var)
     (i/expected map? "a map" args)
     (let [name-sym (gensym)
           var-meta (meta the-var)
           prepared (->> (:arglists var-meta)
-                     (map (partial i/inject-prepare *inject-meta-key* name-sym)))
+                     (map (partial i/inject-prepare u/*inject-meta-key* name-sym)))
           bindings (->> prepared
                      (mapcat first)
                      (mapcat (fn [{:keys [sym injector-fn inject-keys]}]  ; populated in internal.clj

@@ -11,7 +11,8 @@
   (:refer-clojure :exclude [partial])
   (:require
     [dime.internal :as i]
-    [dime.type :as t])
+    [dime.type :as t]
+    [dime.util :as u])
   (:import
     [dime.type InjectableAttributes]))
 
@@ -49,10 +50,11 @@
   (let [deps-map (gensym "deps-map-")
         dep-ids  (->> arg-vec
                    (map (fn [a] (or
-                                  (:inject (meta a))
+                                  (get (meta a) u/*inject-meta-key*)
                                   (when (symbol? a)
                                     (keyword a))
-                                  (i/expected "argument either annotated with :inject, or a symbol" a))))
+                                  (i/expected
+                                    (format "argument either annotated with %s, or a symbol" u/*inject-meta-key*) a))))
                    vec)
         bindings (->> dep-ids
                    (map (fn [k] `(if (contains? ~deps-map ~k)
