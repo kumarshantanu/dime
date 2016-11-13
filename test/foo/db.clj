@@ -7,14 +7,16 @@
 ;   You must not remove this notice, or any other, from this software.
 
 
-(ns foo.db)
+(ns foo.db
+  (:require
+    [dime.util :as du]))
 
 
 (def init-count (atom 0))
 
 
 (defn ^{:inject :connection-pool
-        :post-inject :singleton}
+        :post-inject du/post-inject-invoke}
       make-conn-pool
   [^:inject db-host ^:inject db-port ^:inject username ^:inject password]
   (swap! init-count inc)

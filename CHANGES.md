@@ -19,7 +19,7 @@
   * Post-inject invoke handler for singleton values
 * Miscellaneous
   * Use injection attribute names defined in `dime.util`namespace
-  * [TODO - BREAKING CHANGE] Drop special `:post-inject` annotation `:singleton` (because not composable)
+  * [BREAKING CHANGE] Drop support for special `:post-inject` annotation `:singleton` (because not composable)
 * Var injectables
   * [TODO] Vars can override how to inject by specifying `:inject-with` metadata
   * [TODO] Use `dime.util` fns for var metadata attribute names
