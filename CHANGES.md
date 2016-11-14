@@ -23,7 +23,7 @@
     * Associative destructuring (map literal)
   * Use attribute names in `dime.util` for reading var metadata
 * Non-var injectables
-  * [TODO - BREAKING CHANGE] Make `dime.core/inj` accept injectable attributes as first argument
+  * [BREAKING CHANGE] Accept injection attributes as first argument in `dime.core/inj`
   * Make `dime.core/inj` read metadata using attribute names in `dime.util`
   * Efficient injectables implemented with `defrecord`, discoverable as vars
 

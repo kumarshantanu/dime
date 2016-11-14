@@ -44,8 +44,10 @@
 
 
 (defmacro inj
-  "Given an annotated argument vector create an injectable using the body of code. Pre-inject argument is ignored."
-  [arg-vec & body]
+  "Given injection metadata and an annotated argument vector create an injectable using the body of code. Injection
+  metadata has the keys `:inject`, `:impl-id` and `:post-inject`."
+  [inj-meta arg-vec & body]
+  (i/expected (some-fn map? nil?) "injection metadata as a map" inj-meta)
   (i/expected vector? "argument vector" arg-vec)
   (let [deps-map (gensym "deps-map-")
         dep-ids  (->> arg-vec
@@ -66,7 +68,7 @@
        (let [call-meta# (i/whereami)]
          (merge {:impl-id (format "%s, %s: %d"
                             (:clj-varname call-meta#) (:file-name call-meta#) (:line-number call-meta#))}
-           ~(meta arg-vec)))
+           ~inj-meta))
        ~dep-ids
        (fn [~deps-map pre#]
          (let ~bindings
