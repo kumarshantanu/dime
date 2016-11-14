@@ -21,5 +21,5 @@
 (defn viz-payload
   []
   {:graph-data  (di/attr-map graph :dep-ids)
-   :node-labels (di/attr-map graph :impl-id)
+   :node-labels (di/attr-map graph #(str (:node-id %) \newline (:impl-id %)))
    :node-shapes (di/attr-map graph #(when (:post-inj %) :rectangle))})
