@@ -10,20 +10,20 @@
 
 ## 0.4.0 / 2016-November-??
 
-* Injection support in destructuring argument expressions for vars
-  * Sequential destructuring (vector literal)
-  * Associative destructuring (map literal)
 * Common utility in `dime.util` namespace
   * Overridable injection attribute names
   * Default pre-inject and post-inject handlers
   * Post-inject invoke handler for singleton values
 * Miscellaneous
-  * Use injection attribute names defined in `dime.util`namespace
+  * Use injection attribute names defined in `dime.util` namespace
   * [BREAKING CHANGE] Drop support for special `:post-inject` annotation `:singleton` (because not composable)
 * Var injectables
-  * [TODO] Vars can override how to inject by specifying `:inject-with` metadata
+  * Injection support in destructuring argument expressions for vars
+    * Sequential destructuring (vector literal)
+    * Associative destructuring (map literal)
   * Use attribute names in `dime.util` for reading var metadata
 * Non-var injectables
+  * [TODO - BREAKING CHANGE] Make `dime.core/inj` accept injectable attributes as first argument
   * Make `dime.core/inj` read metadata using attribute names in `dime.util`
   * Efficient injectables implemented with `defrecord`, discoverable as vars
 

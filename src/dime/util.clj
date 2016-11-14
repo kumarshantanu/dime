@@ -13,9 +13,6 @@
 (def ^:dynamic *inject-meta-key* :inject)
 
 
-(def ^:dynamic *inject-with-meta-key* :inject-with)
-
-
 (def ^:dynamic *pre-inject-meta-key* :pre-inject)
 
 
