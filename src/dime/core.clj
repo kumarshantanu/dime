@@ -86,6 +86,47 @@
       (apply assoc m))))
 
 
+(defmacro definj
+  "Define an injectable defrecord that acts as a function after it is instantiated."
+  [sym deps args & body]
+  ;; validate sym
+  (i/expected symbol? "a symbol" sym)
+  (i/expected (comp nil? namespace) "unqualified symbol" sym)
+  ;; validate deps
+  (i/expected vector? "a vector" deps)
+  (i/expected #(every? symbol? %) "a vector of symbols" deps)
+  (let [bodies (cond
+                 (vector? args) (list (cons args body))  ; no argument overloading, we have single arity
+                 (list? args)   (cons args body)         ; one or more arities
+                 :otherwise     (i/expected "valid function body" (cons args body)))]
+    ;; validate args
+    (doseq [[args body] bodies]
+      (i/expected vector? "argument vector" args)
+      (i/expected #(every? (partial not= '&) %) "argument vector without variable args" args)
+      (i/expected #(<= (count %) 20) "argument vector of 20 args or less" args))
+    (let [sym-meta (meta sym)
+          factory  (symbol (str "->" sym))
+          inj-deps (fn [m] (if (get m u/*inject-meta-key*)
+                             m
+                             (assoc m u/*inject-meta-key* true)))
+          exprs    (map (fn [[args & body]]
+                          (let [arg-syms (repeatedly (count args) (partial gensym "arg-"))
+                                bindings (interleave args arg-syms)]
+                            `(~'invoke [this# ~@arg-syms] (let [~@bindings] ~@body))))
+                     bodies)]
+      `(let [post-inj# (get ~sym-meta ~(do u/*post-inject-meta-key*) u/post-inject-default)]
+         (defrecord ~sym ~deps
+           clojure.lang.IFn
+           ~@exprs)
+         ;; update metadata to make it look like a defn var
+         (alter-meta! (var ~factory) merge ~sym-meta
+           {~(do u/*inject-meta-key*) ~(get (meta sym) u/*inject-meta-key* (keyword sym))
+            :definj      true
+            :arglists    '~(list (map #(vary-meta % inj-deps) deps))
+            :post-inject (fn [f# k# m#]
+                           (post-inj# (u/post-inject-invoke f# k# m#) k# m#))})))))
+
+
 (defn process-pre-inject
   "Return the result of applying pre-inject fn to remaining args if pre-inject is non-nil, pre-injected injectable
   otherwise. Default pre-inject processor.

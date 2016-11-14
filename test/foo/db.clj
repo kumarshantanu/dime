@@ -9,6 +9,7 @@
 
 (ns foo.db
   (:require
+    [dime.core :as di]
     [dime.util :as du]))
 
 
@@ -21,6 +22,12 @@
   [^:inject db-host ^:inject db-port ^:inject username ^:inject password]
   (swap! init-count inc)
   :dummy-pool)
+
+
+(di/definj ^{:post-inject du/post-inject-invoke} items-cache
+  [connection-pool]
+  []
+  :dummy-cache)
 
 
 (defn ^{:inject :find-items} db-find-items

@@ -25,8 +25,7 @@
   * Use attribute names in `dime.util` for reading var metadata
 * Non-var injectables
   * Make `dime.core/inj` read metadata using attribute names in `dime.util`
-  * [TODO] Custom, efficient injectable types as defrecord
-  * [TODO] Discoverable as a var
+  * Efficient injectables implemented with `defrecord`, discoverable as vars
 
 
 ## 0.3.0 / 2016-September-13

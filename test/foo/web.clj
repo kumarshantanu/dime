@@ -15,6 +15,11 @@
   :dummy-user)
 
 
+(defn web-browse-items
+  [^{:inject :service-browse-items} browse-items user-id]
+  {:respose (browse-items user-id)})
+
+
 (defn web-create-order
   [^:inject {:keys [find-user]
              service-create-order :svc/create-order

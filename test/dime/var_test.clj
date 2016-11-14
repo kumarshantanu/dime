@@ -62,10 +62,14 @@
             {:keys [connection-pool
                     db-create-order
                     find-items
+                    items-cache
+                    service-browse-items
                     web-create-order]} injected
             service-create-order (:svc/create-order injected)]
         (is (= 1 @foo.db/init-count) "Initialization must happen exactly once")
         (is (= :dummy-pool                 connection-pool))
+        (is (= :dummy-cache                items-cache))
+        (is (= {:items :mock-items}        (service-browse-items :dummy-user-id)))
         (is (= {:items :dummy}             (find-items :dummy)))
         (is (= {:created-order :dummy}     (db-create-order :dummy)))
         (is (= {:created-order
