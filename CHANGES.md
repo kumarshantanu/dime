@@ -23,8 +23,6 @@
 * Var injectables
   * [TODO] Vars can override how to inject by specifying `:inject-with` metadata
   * Use attribute names in `dime.util` for reading var metadata
-  * [TODO] Support for creating injectable alias to pre-existing ordinary vars
-  * [TODO] Support for updating pre-existing var metadata with injection info
 * Non-var injectables
   * Make `dime.core/inj` read metadata using attribute names in `dime.util`
   * [TODO] Custom, efficient injectable types as defrecord
