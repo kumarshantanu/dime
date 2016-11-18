@@ -31,12 +31,12 @@
                           (->> (:arglists var-meta)
                             (apply concat)
                             (some #(get (meta %) u/*inject-meta-key*))
-                            (or (get var-meta u/*inject-meta-key*))))))
+                            (or (get var-meta u/*expose-meta-key*))))))
   (iattrs   [the-var] (when (t/valid? the-var)
                         (let [var-meta (meta the-var)]
                           (t/map->InjectableAttributes
-                            {:node-id  (let [ik (get var-meta u/*inject-meta-key*)]
-                                         (if (or (true? ik) (nil? ik)) (keyword (:name var-meta)) ik))
+                            {:node-id  (let [ek (get var-meta u/*expose-meta-key*)]
+                                         (if (or (true? ek) (nil? ek)) (keyword (:name var-meta)) ek))
                              :impl-id  (symbol (str (.getName ^Namespace (:ns var-meta)) \/ (:name var-meta)))
                              :dep-ids  (->> (:arglists var-meta)
                                          (map (partial i/inject-prepare u/*inject-meta-key* the-var))

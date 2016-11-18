@@ -16,7 +16,7 @@
 (def init-count (atom 0))
 
 
-(defn ^{:inject :connection-pool
+(defn ^{:expose :connection-pool
         :post-inject du/post-inject-invoke}
       make-conn-pool
   [^:inject db-host ^:inject db-port ^:inject username ^:inject password]
@@ -30,7 +30,7 @@
   :dummy-cache)
 
 
-(defn ^{:inject :find-items} db-find-items
+(defn ^{:expose :find-items} db-find-items
   [^:inject connection-pool item-ids]
   {:items item-ids})
 

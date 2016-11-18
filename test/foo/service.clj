@@ -18,7 +18,7 @@
   :mock-items)
 
 
-(defn ^:inject recommend-products
+(defn ^:expose recommend-products
   "Return item IDs for specified user ID."
   [^:inject items-cache user-id]
   (let [item-ids (get items-cache user-id)]
@@ -32,7 +32,7 @@
     (find-items item-ids)))
 
 
-(defn ^{:inject :svc/create-order} service-create-order
+(defn ^{:expose :svc/create-order} service-create-order
   [^:inject [find-items db-create-order]
    user-details order-details]
   (let [item-ids   (find-items (:item-ids order-details))

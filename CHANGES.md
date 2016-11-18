@@ -3,6 +3,7 @@
 ## TODO
 
 * [TODO] Annotate a var (args, inject, pre/post-inject) at runtime (3rd party code)
+* [TODO] Instrumentation support for `definj`
 * [TODO] Introduce injection contexts
   * [TODO] Identification mechanism for injectables per context
   * [TODO] Visibility control for injectables per context
@@ -15,8 +16,9 @@
   * Default pre-inject and post-inject handlers
   * Post-inject invoke handler for singleton values
 * Miscellaneous
+  * [BREAKING CHANGE] Replace exposure metadata tag `:inject` with `:expose` for clarity
+  * [BREAKING CHANGE] Drop support for `:post-inject` annotation `:singleton` (not composable)
   * Use injection attribute names defined in `dime.util` namespace
-  * [BREAKING CHANGE] Drop support for special `:post-inject` annotation `:singleton` (because not composable)
 * Var injectables
   * Injection support in destructuring argument expressions for vars
     * Sequential destructuring (vector literal)

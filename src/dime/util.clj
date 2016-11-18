@@ -10,6 +10,9 @@
 (ns dime.util)
 
 
+(def ^:dynamic *expose-meta-key* :expose)
+
+
 (def ^:dynamic *inject-meta-key* :inject)
 
 

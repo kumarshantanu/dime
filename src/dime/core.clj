@@ -27,7 +27,7 @@
 
 (defn inj*
   "Given an injection option map, dependency-keys and an arity-2 function to carry out injection, return an injectable."
-  [{:keys [inject
+  [{:keys [expose
            impl-id
            pre-inject
            post-inject]
@@ -35,7 +35,7 @@
     :as options} dep-ids f]
   (reify t/Injectable
     (valid? [_] true)
-    (iattrs [_] (t/map->InjectableAttributes {:node-id  inject
+    (iattrs [_] (t/map->InjectableAttributes {:node-id  expose
                                               :impl-id  impl-id
                                               :dep-ids  dep-ids
                                               :pre-inj  pre-inject
@@ -122,7 +122,7 @@
            ~@exprs)
          ;; update metadata to make it look like a defn var
          (alter-meta! (var ~factory) merge ~sym-meta
-           {~(do u/*inject-meta-key*) ~(get (meta sym) u/*inject-meta-key* (keyword sym))
+           {~(do u/*expose-meta-key*) ~(get (meta sym) u/*expose-meta-key* (keyword sym))
             :definj      true
             :arglists    '~(list (map #(vary-meta % inj-deps) deps))
             :post-inject (fn [f# k# m#]
