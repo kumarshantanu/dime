@@ -28,13 +28,13 @@
 ;; ----- injection utility fns -----
 
 
-(defn pre-inject-default
+(defn pre-inject-identity
   "Identity pre injector - return the injectable object intact."
   [injectable deps]
   injectable)
 
 
-(defn post-inject-default
+(defn post-inject-identity
   "Identity post injector - return the injected object intact."
   [injected node-id deps]
   injected)
@@ -63,7 +63,7 @@
                #(each-pre-injector % deps)) $ (repeat deps))
         (apply comp $)
         ($ injectable)))
-    pre-inject-default))
+    pre-inject-identity))
 
 
 (defn comp-post-inject
@@ -76,4 +76,4 @@
                #(each-post-injector % node-id deps)) $ (repeat node-id) (repeat deps))
         (apply comp $)
         ($ injected)))
-    post-inject-default))
+    post-inject-identity))

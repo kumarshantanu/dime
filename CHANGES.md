@@ -13,7 +13,7 @@
 
 * Common utility in `dime.util` namespace
   * Overridable injection attribute names
-  * Default pre-inject and post-inject handlers
+  * Identity (default) pre-inject and post-inject handlers
   * Post-inject invoke handler for singleton values
   * Post-inject handler to update a var with injected object
   * Utility fns to compose pre-inject and post-inject handlers

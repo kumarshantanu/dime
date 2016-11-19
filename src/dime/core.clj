@@ -116,7 +116,7 @@
                                 bindings (interleave args arg-syms)]
                             `(~'invoke [this# ~@arg-syms] (let [~@bindings] ~@body))))
                      bodies)]
-      `(let [post-inj# (get ~sym-meta ~(do u/*post-inject-meta-key*) u/post-inject-default)]
+      `(let [post-inj# (get ~sym-meta ~(do u/*post-inject-meta-key*) u/post-inject-identity)]
          (defrecord ~sym ~deps
            clojure.lang.IFn
            ~@exprs)
