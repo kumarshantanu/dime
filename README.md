@@ -1,5 +1,7 @@
 # dime
 
+[![Build Status](https://travis-ci.org/kumarshantanu/dime.svg)](https://travis-ci.org/kumarshantanu/dime)
+
 Dependency Injection Made Easy for Clojure.
 
 Dime implements [dependency injection/inversion](https://en.wikipedia.org/wiki/Dependency_inversion_principle) by
