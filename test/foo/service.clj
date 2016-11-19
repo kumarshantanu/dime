@@ -9,7 +9,8 @@
 
 (ns foo.service
   (:require
-    [dime.core :as di]))
+    [dime.core :as di]
+    [dime.util :as du]))
 
 
 (defn find-items
@@ -18,7 +19,12 @@
   :mock-items)
 
 
-(defn ^:expose recommend-products
+(def recommend-products nil)
+
+
+(defn ^{:expose true
+        :post-inject (du/post-inject-alter #'recommend-products)}
+      recommend-products-impl
   "Return item IDs for specified user ID."
   [^:inject items-cache user-id]
   (let [item-ids (get items-cache user-id)]
@@ -26,7 +32,7 @@
 
 
 (di/definj service-browse-items
-  [find-items recommend-products]
+  [find-items]
   [user-id]
   (let [item-ids (recommend-products user-id)]
     (find-items item-ids)))

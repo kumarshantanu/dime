@@ -15,6 +15,8 @@
   * Overridable injection attribute names
   * Default pre-inject and post-inject handlers
   * Post-inject invoke handler for singleton values
+  * Post-inject handler to update a var with injected object
+  * Utility fns to compose pre-inject and post-inject handlers
 * Miscellaneous
   * [BREAKING CHANGE] Replace exposure metadata tag `:inject` with `:expose` for clarity
   * [BREAKING CHANGE] Drop support for `:post-inject` annotation `:singleton` (not composable)
