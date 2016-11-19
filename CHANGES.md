@@ -16,11 +16,11 @@
   * Identity (default) pre-inject and post-inject handlers
   * Post-inject invoke handler for singleton values
   * Post-inject handler to update a var with injected object
-  * Utility fns to compose pre-inject and post-inject handlers
 * Miscellaneous
   * [BREAKING CHANGE] Replace exposure metadata tag `:inject` with `:expose` for clarity
   * [BREAKING CHANGE] Drop support for `:post-inject` annotation `:singleton` (not composable)
   * Use injection attribute names defined in `dime.util` namespace
+  * Pre and post injectors can now be either a fn or a collection of fns to be applied left to right
 * Var injectables
   * Injection support in destructuring argument expressions for vars
     * Sequential destructuring (vector literal)

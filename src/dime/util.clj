@@ -53,27 +53,10 @@
     (alter-var-root the-var (constantly injected))))
 
 
-(defn comp-pre-inject
-  "Compose multiple pre injectors into one. Like clojure.core/comp, except it accepts arity-2 fns as pre-injectors."
-  [& pre-injectors]
-  (if (seq pre-injectors)
-    (fn [injectable deps]
-      (as-> pre-injectors $
-        (map (fn [each-pre-injector deps]
-               #(each-pre-injector % deps)) $ (repeat deps))
-        (apply comp $)
-        ($ injectable)))
-    pre-inject-identity))
-
-
-(defn comp-post-inject
-  "Compose multiple post injectors into one. Like clojure.core/comp, except it accepts arity-3 fns as post-injectors."
-  [& post-injectors]
-  (if (seq post-injectors)
-    (fn [injected node-id deps]
-      (as-> post-injectors $
-        (map (fn [each-post-injector node-id deps]
-               #(each-post-injector % node-id deps)) $ (repeat node-id) (repeat deps))
-        (apply comp $)
-        ($ injected)))
-    post-inject-identity))
+(defn is-or-has?
+  "Return true if container is the same as element or container is a collection containing element, false otherwise.
+  Useful to check for existence of pre or post injector."
+  [container element]
+  (or (= container element)
+    (and (coll? container)
+      (boolean (some (partial = element) container)))))

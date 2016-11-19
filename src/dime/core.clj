@@ -133,12 +133,15 @@
   "Return the result of applying pre-inject fn to remaining args if pre-inject is non-nil, pre-injected injectable
   otherwise. Default pre-inject processor.
   Arguments:
-   pre-inject  ; pre-inject fn
+   pre-inject  ; pre-inject fn, or nil, or a collection of pre-inject fns
    injectable  ; injectable to be injected with dependencies
    args        ; map to resolve dependencies from"
   [pre-inject injectable args]
   (if pre-inject
-    (pre-inject injectable args)
+    (if (coll? pre-inject)
+      (reduce (fn [pre-injected each-pre-inject] (each-pre-inject pre-injected args))
+        injectable pre-inject)
+      (pre-inject injectable args))
     injectable))
 
 
@@ -158,13 +161,16 @@
   "Return the result of applying post-inject fn to remaining args if post-inject is non-nil, injected instance
   otherwise. Default post-inject processor.
   Arguments:
-   post-inject ; post-inject fn
+   post-inject ; post-inject fn, or nil, or a collection of post-inject-fns
    injected    ; the partial fn created from the injectable
    node-ID     ; node ID for the injectable
    resolved    ; resolved map of seed + dependencies so far"
   [post-inject injected node-id resolved]
   (if post-inject
-    (post-inject injected node-id resolved)
+    (if (coll? post-inject)
+      (reduce (fn [post-injected each-post-inject] (each-post-inject post-injected node-id resolved))
+        injected post-inject)
+      (post-inject injected node-id resolved))
     injected))
 
 

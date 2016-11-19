@@ -10,7 +10,8 @@
 (ns foo.init
   (:require
     [dime.core :as di]
-    [dime.var  :as dv]))
+    [dime.var  :as dv]
+    [dime.util :as du]))
 
 
 (def graph (dv/ns-vars->graph ['foo.web
@@ -22,4 +23,5 @@
   []
   {:graph-data  (di/attr-map graph :dep-ids)
    :node-labels (di/attr-map graph #(str (:node-id %) \newline (:impl-id %)))
-   :node-shapes (di/attr-map graph #(when (:post-inj %) :rectangle))})
+   :node-shapes (di/attr-map graph #(when (du/is-or-has? (:post-inj %) du/post-inject-invoke)
+                                      :rectangle))})
