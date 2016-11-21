@@ -70,6 +70,7 @@
         (is (= :dummy-pool                 connection-pool))
         (is (= :dummy-cache                items-cache))
         (is (= {:items :mock-items}        (service-browse-items :dummy-user-id)))
+        (is (thrown? ArityException        (service-browse-items :dummy-user-id :bad-arg)))
         (is (= {:items :dummy}             (find-items :dummy)))
         (is (= {:created-order :dummy}     (db-create-order :dummy)))
         (is (= {:created-order

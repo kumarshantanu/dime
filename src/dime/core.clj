@@ -10,10 +10,12 @@
 (ns dime.core
   (:refer-clojure :exclude [partial])
   (:require
+    [clojure.set   :as set]
     [dime.internal :as i]
     [dime.type :as t]
     [dime.util :as u])
   (:import
+    [clojure.lang ArityException]
     [dime.type InjectableAttributes]))
 
 
@@ -111,20 +113,30 @@
           inj-deps (fn [m] (if (get m u/*inject-meta-key*)
                              m
                              (assoc m u/*inject-meta-key* true)))
-          exprs    (map (fn [[args & body]]
-                          (let [arg-syms (repeatedly (count args) (partial gensym "arg-"))
-                                bindings (interleave args arg-syms)]
-                            `(~'invoke [this# ~@arg-syms] (let [~@bindings] ~@body))))
-                     bodies)]
+          matching (map (fn [[args & body]]
+                       (let [arg-syms (repeatedly (count args) (partial gensym "arg-"))
+                             bindings (interleave args arg-syms)]
+                         `(~'invoke [this# ~@arg-syms] (let [~@bindings] ~@body))))
+                     bodies)
+          no-match (let [arity-set (->> bodies
+                                     (map (comp count first))
+                                     set)]
+                     (->> arity-set
+                       (set/difference (set (range 20)))
+                       (map (fn [bad-arity]
+                              `(~'invoke [this# ~@(repeatedly bad-arity gensym)]
+                                 (throw (ArityException.
+                                          ~(int bad-arity) ~(str sym " accepting " arity-set " args"))))))))]
       `(let [post-inj# (get ~sym-meta ~(do u/*post-inject-meta-key*) u/post-inject-identity)]
          (defrecord ~sym ~deps
            clojure.lang.IFn
-           ~@exprs)
+           ~@matching
+           ~@no-match)
          ;; update metadata to make it look like a defn var
          (alter-meta! (var ~factory) merge ~sym-meta
            {~(do u/*expose-meta-key*) ~(get (meta sym) u/*expose-meta-key* (keyword sym))
             :definj      true
-            :arglists    '~(list (map #(vary-meta % inj-deps) deps))
+            :arglists    '~(list (mapv #(vary-meta % inj-deps) deps))
             :post-inject (fn [f# k# m#]
                            (post-inj# (u/post-inject-invoke f# k# m#) k# m#))})))))
 
