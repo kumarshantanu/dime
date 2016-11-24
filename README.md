@@ -10,7 +10,7 @@ creating partially applied functions in an inexpensive (boiler-plate free), most
 
 ## Usage
 
-Leiningen coordinates: `[dime "0.3.0"]`
+Leiningen coordinates: `[dime "0.4.0"]`
 
 
 ### Example
@@ -21,18 +21,22 @@ code in a similar fashion (with metadata tags) in your application for automatic
 
 #### Annotated functions
 
-Notice the meta data tags (`:inject`, `:post-inject`) used in the code.
+Notice the meta data tags (`:expose`, `:inject`, `:post-inject`) used in the code.
 
 ```clojure
 ;; ---------------- in namespace foo.db ----------------
 
-(defn ^{:inject :connection-pool
-        :post-inject (fn [f k m] (f))}  ; execute fn to obtain connection-pool, same as `:post-inject :singleton`
+(ns foo.db
+  (:require
+    [dime.util :as du]))
+
+(defn ^{:expose :connection-pool
+        :post-inject du/post-inject-invoke}  ; execute fn to obtain connection-pool
       make-conn-pool
   [^:inject db-host ^:inject db-port ^:inject username ^:inject password]
   :dummy-pool)
 
-(defn ^{:inject :find-items} db-find-items
+(defn ^{:expose :find-items} db-find-items
   [^:inject connection-pool item-ids]
   {:items item-ids})
 
@@ -50,7 +54,7 @@ Notice the meta data tags (`:inject`, `:post-inject`) used in the code.
 
 ;; ---------------- in namespace foo.web ----------------
 
-(defn ^:inject find-user  ; vars must have at least one inject annotation to participate in dependency discovery
+(defn ^:expose find-user  ; vars must have at least one inject annotation to participate in dependency discovery
   [session]
   :dummy-user)
 
@@ -126,8 +130,8 @@ $ lein viz -s foo.init/viz-payload
 ### How it works
 
 * The `:inject` meta data tag is required for all dependency arguments to be injected.
-* The `defn` var names are keywordized to form their injection names unless overridden by the `:inject` tag.
-* The `:inject` tags on `defn` arguments are matched against the `:inject` names of the `defn` vars.
+* The `defn` var names are keywordized to form their injection names unless overridden by the `:expose` tag.
+* The `:inject` tags on `defn` arguments are matched against the `:expose` names of the `defn` vars.
 * Arguments marked with `:inject` are looked up in seed data first, followed by other dependencies.
 * The `:pre-inject` tag is used for custom processing before partial fn is created. By default, no processing is done.
 * The `:post-inject` tag is used for custom processing after partial fn is created. By default, no processing is done.

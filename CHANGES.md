@@ -9,7 +9,7 @@
   * [TODO] Visibility control for injectables per context
 
 
-## 0.4.0 / 2016-November-??
+## 0.4.0 / 2016-November-24
 
 * Common utility in `dime.util` namespace
   * Overridable injection attribute names
