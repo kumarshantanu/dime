@@ -4,6 +4,9 @@
 
 * [TODO] Annotate a var (args, inject, pre/post-inject) at runtime (3rd party code)
 * [TODO] Instrumentation support for `definj`
+* [TODO] Implement `clojure.lang.IFn/applyTo` in `definj`
+* [TODO] Use same type hints in exposed fn dependencies/args as in original fns
+* [TODO] Support for ClojureScript/ClojureCLR
 * [TODO] Introduce injection contexts
   * [TODO] Identification mechanism for injectables per context
   * [TODO] Visibility control for injectables per context
