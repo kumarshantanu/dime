@@ -2,6 +2,10 @@
 
 ## TODO
 
+* [TODO] Support for `:expose` annotation to be associated with one or more keys
+* [TODO] Support for drop-in replacement for Clojure facilities
+  * [TODO] `dime.dropin/defmulti` Support for multi-methods
+  * [TODO] `dime.dropin/defn` Support for non-declarative injection
 * [TODO] Annotate a var (args, inject, pre/post-inject) at runtime (3rd party code)
 * [TODO] Instrumentation support for `definj`
 * [TODO] Implement `clojure.lang.IFn/applyTo` in `definj`
