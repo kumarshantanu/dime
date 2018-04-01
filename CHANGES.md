@@ -2,18 +2,24 @@
 
 ## TODO
 
-* [TODO] Support for `:expose` annotation to be associated with one or more keys
 * [TODO] Support for drop-in replacement for Clojure facilities
   * [TODO] `dime.dropin/defmulti` Support for multi-methods
-  * [TODO] `dime.dropin/defn` Support for non-declarative injection
+  * [TODO] `dime.dropin/defn` Support for non-declarative injection (scanning code)
 * [TODO] Annotate a var (args, inject, pre/post-inject) at runtime (3rd party code)
+* [TODO] Support for ClojureScript/ClojureCLR
+* [TODO] Introduce injection contexts
+  * [TODO] Support for `:expose` annotation to be associated with one or more keys
+  * [TODO] Identification mechanism for injectables per context, e.g. `:context [:db :global]`
+  * [TODO] Visibility control for injectables per context
+
+
+## [WIP] 0.5.0 / 2018-April-??
+
+* [TODO] Support for creating/removing virtual namespaces with injected vars
 * [TODO] Instrumentation support for `definj`
 * [TODO] Implement `clojure.lang.IFn/applyTo` in `definj`
 * [TODO] Use same type hints in exposed fn dependencies/args as in original fns
-* [TODO] Support for ClojureScript/ClojureCLR
-* [TODO] Introduce injection contexts
-  * [TODO] Identification mechanism for injectables per context
-  * [TODO] Visibility control for injectables per context
+- [TODO] Overhaul documentation
 
 
 ## 0.4.0 / 2016-November-24
