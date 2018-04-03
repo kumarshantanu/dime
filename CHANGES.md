@@ -15,7 +15,10 @@
 
 ## [WIP] 0.5.0 / 2018-April-??
 
-* [TODO] Support for creating/removing virtual namespaces with injected vars
+* [TODO - BREAKING CHANGE] Drop support for Clojure 1.5, 1.6
+* Add support for creating/removing virtual namespaces with injected vars
+  - `dime.var/create-vars!`
+  - `dime.var/remove-vars!`
 * [TODO] Instrumentation support for `definj`
 * [TODO] Implement `clojure.lang.IFn/applyTo` in `definj`
 * [TODO] Use same type hints in exposed fn dependencies/args as in original fns

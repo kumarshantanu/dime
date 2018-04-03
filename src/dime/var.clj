@@ -9,6 +9,7 @@
 
 (ns dime.var
   (:require
+    [clojure.string :as string]
     [dime.internal :as i]
     [dime.type :as t]
     [dime.util :as u])
@@ -127,3 +128,56 @@
        (reduce (partial as-var-kv-entry (fn [k iv] iv))  graph ns-symbols))))
   ([ns-symbols]
     (ns-vars->graph {} ns-symbols)))
+
+
+(defn create-vars!
+  "Create vars (and namespaces) for realized injectables, returning a collection of fully-qualified created var names."
+  ([realized-graph]
+    (create-vars! realized-graph {}))
+  ([realized-graph {:keys [ns-prefix
+                           var-graph]
+                    :or {ns-prefix "injected"}}]
+    (i/expected #(not= \. (first %)) "ns-prefix not beginning with ." ns-prefix)
+    (i/expected #(not= \. (last %))  "ns-prefix not ending with ." ns-prefix)
+    (i/expected #(= % (string/trim %)) "ns-prefix to have no whitespace" ns-prefix)
+    (i/expected map? "map of realized injectables" realized-graph)
+    (doseq [[k v] (seq realized-graph)]
+      (i/expected keyword? "keyword node-ID for injectable" k))
+    (->> (seq realized-graph)
+      (sort-by first)
+      (group-by (comp namespace first))
+      seq
+      (reduce (fn [all-names [ns-suffix coll]]
+                (let [ns-str (if ns-suffix
+                               (str ns-prefix \. ns-suffix)
+                               ns-prefix)
+                      var-ns (create-ns (symbol ns-str))]                  ; create namespace
+                  (loop [coll (seq coll)
+                         nams all-names]
+                    (if (nil? coll)
+                      nams
+                      (let [[exposed-keyword realized-val] (first coll)
+                            varname-str (name exposed-keyword)]
+                        (as-> (get var-graph exposed-keyword) $
+                          (meta $)
+                          (with-meta (symbol varname-str) $)
+                          (intern var-ns $ realized-val))                  ; create var
+                        (recur (next coll) (conj nams (str ns-str \/ varname-str))))))))
+        []))))
+
+
+(defn remove-vars!
+  "Remove the vars (and namespaces) indicated by specified fully-qualified var names."
+  [fully-qualified-var-names]
+  (i/expected coll? "collection of var names" fully-qualified-var-names)
+  (->> fully-qualified-var-names
+    (map symbol)
+    sort
+    (group-by namespace)
+    seq
+    (map (fn [[each-ns-str name-str-coll]]
+           (let [ns-sym (symbol each-ns-str)]
+             (doseq [each-varname-str name-str-coll]
+               (ns-unalias ns-sym (symbol each-varname-str)))  ; remove each var
+             (remove-ns ns-sym))))                             ; remove the namespace
+    dorun))
