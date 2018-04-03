@@ -119,26 +119,26 @@
     (if-let [inject-tag (get (meta arg) inject-meta-key)]
       (if (true? inject-tag)
         (cond
-          (symbol? arg)       (info-map (fn [ks vs] (first vs)) [(keyword arg)])
-          (and (vector? arg)) (->> (take-while (complement #{'& :as}) arg)
-                                (map (fn [param]
-                                       (let [inject-name (get (meta param) inject-meta-key)]
-                                         (expected (comp not false?) "non-false :inject tag"
-                                           inject-name)
-                                         (if (and inject-name (not (true? inject-name)))
-                                           inject-name
-                                           (if (symbol? param)
-                                             (keyword param)
-                                             (no-infer param))))))
-                                (info-map (fn [ks vs] (vec vs))))
-          (and (map? arg))    (->> (seq arg)
-                                (filter (comp not keyword? first))
-                                (map second)
-                                (concat (map keyword (:keys arg)))
-                                (concat (map symbol (:syms arg)))
-                                (concat (map str (:strs arg)))
-                                (info-map zipmap))
-          :otherwise          (no-infer arg))
+          (symbol? arg) (info-map (fn [ks vs] (first vs)) [(keyword arg)])
+          (vector? arg) (->> (take-while (complement #{'& :as}) arg)
+                          (map (fn [param]
+                                 (let [inject-name (get (meta param) inject-meta-key)]
+                                   (expected (comp not false?) "non-false :inject tag"
+                                     inject-name)
+                                   (if (and inject-name (not (true? inject-name)))
+                                     inject-name
+                                     (if (symbol? param)
+                                       (keyword param)
+                                       (no-infer param))))))
+                          (info-map (fn [ks vs] (vec vs))))
+          (map? arg)    (->> (seq arg)
+                          (filter (comp not keyword? first))
+                          (map second)
+                          (concat (map keyword (:keys arg)))
+                          (concat (map symbol (:syms arg)))
+                          (concat (map str (:strs arg)))
+                          (info-map zipmap))
+          :otherwise    (no-infer arg))
         (info-map (fn [ks vs] (first vs)) [inject-tag]))
       (info-map nil nil))))
 
