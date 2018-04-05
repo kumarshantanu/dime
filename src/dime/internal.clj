@@ -109,38 +109,40 @@
 (defn arg-info
   "Return a map of argument info. Helper for `inject-prepare`."
   [inject-meta-key arg]
-  (let [info-map (fn [injector-fn inject-keys]
+  (let [info-map (fn [injector-fn inject-syms inject-keys]
                    {:arg arg
                     :sym (gensym (if injector-fn "inject-" "arg-"))
                     :injector-fn injector-fn  ; non-nil injector-fn implies injectable dependency
+                    :inject-syms inject-syms
                     :inject-keys inject-keys})
         no-infer (fn [a] (throw (ex-info (str "Cannot infer inject key for argument " (pr-str a))
                                   {:argument a})))]
     (if-let [inject-tag (get (meta arg) inject-meta-key)]
       (if (true? inject-tag)
         (cond
-          (symbol? arg) (info-map (fn [ks vs] (first vs)) [(keyword arg)])
-          (vector? arg) (->> (take-while (complement #{'& :as}) arg)
-                          (map (fn [param]
-                                 (let [inject-name (get (meta param) inject-meta-key)]
-                                   (expected (comp not false?) "non-false :inject tag"
-                                     inject-name)
-                                   (if (and inject-name (not (true? inject-name)))
-                                     inject-name
-                                     (if (symbol? param)
-                                       (keyword param)
-                                       (no-infer param))))))
-                          (info-map (fn [ks vs] (vec vs))))
+          (symbol? arg) (info-map (fn [ks vs] (first vs)) [arg] [(keyword arg)])
+          (vector? arg) (let [fixed-args (take-while (complement #{'& :as}) arg)]
+                          (->> fixed-args
+                            (map (fn [param]
+                                   (let [inject-name (get (meta param) inject-meta-key)]
+                                     (expected (comp not false?) "non-false :inject tag"
+                                       inject-name)
+                                     (if (and inject-name (not (true? inject-name)))
+                                       inject-name
+                                       (if (symbol? param)
+                                         (keyword param)
+                                         (no-infer param))))))
+                            (info-map (fn [ks vs] (vec vs)) fixed-args)))
           (map? arg)    (->> (seq arg)
                           (filter (comp not keyword? first))
-                          (map second)
-                          (concat (map keyword (:keys arg)))
-                          (concat (map symbol (:syms arg)))
-                          (concat (map str (:strs arg)))
-                          (info-map zipmap))
+                          (concat (map (juxt (comp symbol name) keyword) (:keys arg)))
+                          (concat (map (juxt (comp symbol name) symbol)  (:syms arg)))
+                          (concat (map (juxt identity           str)     (:strs arg)))
+                          ((juxt #(mapv first %) #(mapv second %))) ; extra-parens=invoke
+                          (apply info-map zipmap))
           :otherwise    (no-infer arg))
-        (info-map (fn [ks vs] (first vs)) [inject-tag]))
-      (info-map nil nil))))
+        (info-map (fn [ks vs] (first vs)) [arg] [inject-tag]))
+      (info-map nil nil nil))))
 
 
 (defn inject-prepare

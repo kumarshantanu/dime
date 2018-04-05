@@ -130,6 +130,32 @@
     (ns-vars->graph {} ns-symbols)))
 
 
+(defn sym->inject-key
+  "Given ns/var/dependency symbols, return the corresponding inject-key for the dependency symbol. If no inject-key is
+  found, return nil."
+  [ns-sym var-sym dep-sym]
+  (i/expected symbol? "ns symbol"  ns-sym)
+  (i/expected symbol? "var symbol" var-sym)
+  (i/expected symbol? "dependency symbol" dep-sym)
+  (require ns-sym)
+  (when-let [the-var (find-var (symbol (str ns-sym \/ var-sym)))]
+    (let [var-meta (meta the-var)]
+      (loop [attr-maps (->> (:arglists var-meta)
+                         (map (partial i/inject-prepare u/*inject-meta-key* the-var))
+                         (mapcat first)
+                         seq)]
+        (when attr-maps
+          (let [attrs (first attr-maps)]
+            (or
+              (loop [syms (seq (:inject-syms attrs))
+                     keys (seq (:inject-keys attrs))]
+                (when-not (or (nil? syms) (nil? keys))
+                  (if (= (first syms) dep-sym)
+                    (first keys)
+                    (recur (next syms) (next keys)))))
+              (recur (next attr-maps)))))))))
+
+
 (defn create-vars!
   "Create vars (and namespaces) for realized injectables, returning a collection of fully-qualified created var names."
   ([realized-graph]

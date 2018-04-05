@@ -19,6 +19,7 @@
 * Add support for creating/removing virtual namespaces with injected vars
   - `dime.var/create-vars!`
   - `dime.var/remove-vars!`
+  - `dime.var/sym->inject-key` for tools: navigation support
 * [TODO] Instrumentation support for `definj`
 * [TODO] Implement `clojure.lang.IFn/applyTo` in `definj`
 * [TODO] Use same type hints in exposed fn dependencies/args as in original fns
