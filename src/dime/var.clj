@@ -130,30 +130,48 @@
     (ns-vars->graph {} ns-symbols)))
 
 
-(defn sym->inject-key
-  "Given ns/var/dependency symbols, return the corresponding inject-key for the dependency symbol. If no inject-key is
+(def ^{:doc "Last ns-prefix (string) used to create injected vars."
+       :tag "java.lang.String"
+       :private true
+       :redef true} last-ns-prefix
+  nil)
+
+
+(defn sym->source
+  "Given ns/var/dependency symbols, return the corresponding source - fully-qualified var name as a string. If not
   found, return nil."
   [ns-sym var-sym dep-sym]
   (i/expected symbol? "ns symbol"  ns-sym)
   (i/expected symbol? "var symbol" var-sym)
   (i/expected symbol? "dependency symbol" dep-sym)
   (require ns-sym)
-  (when-let [the-var (find-var (symbol (str ns-sym \/ var-sym)))]
-    (let [var-meta (meta the-var)]
-      (loop [attr-maps (->> (:arglists var-meta)
-                         (map (partial i/inject-prepare u/*inject-meta-key* the-var))
-                         (mapcat first)
-                         seq)]
-        (when attr-maps
-          (let [attrs (first attr-maps)]
-            (or
-              (loop [syms (seq (:inject-syms attrs))
-                     keys (seq (:inject-keys attrs))]
-                (when-not (or (nil? syms) (nil? keys))
-                  (if (= (first syms) dep-sym)
-                    (first keys)
-                    (recur (next syms) (next keys)))))
-              (recur (next attr-maps)))))))))
+  (i/when-let-multi [the-var  (find-var (symbol (str ns-sym \/ var-sym)))
+                     var-meta (meta the-var)
+                     inj-key  (loop [attr-maps (->> (:arglists var-meta)
+                                                 (map (partial i/inject-prepare u/*inject-meta-key* the-var))
+                                                 (mapcat first)
+                                                 seq)]
+                                (when attr-maps
+                                  (let [attrs (first attr-maps)]
+                                    (or
+                                      (loop [syms (seq (:inject-syms attrs))
+                                             keys (seq (:inject-keys attrs))]
+                                        (when (and syms keys)  ; both are not-nil
+                                          (if (= (first syms) dep-sym)
+                                            (first keys)
+                                            (recur (next syms) (next keys)))))
+                                      (recur (next attr-maps))))))
+                     prefix   last-ns-prefix
+                     inj-ns   (if-let [ikns (namespace inj-key)]
+                                (str prefix \. ikns)
+                                prefix)
+                     inj-var  (->> (name inj-key)
+                                (str inj-ns \/)
+                                symbol
+                                find-var)
+                     inj-meta (meta inj-var)
+                     impl-id  (:impl-id inj-meta)]
+    (str impl-id)))
 
 
 (defn create-vars!
@@ -169,6 +187,9 @@
     (i/expected map? "map of realized injectables" realized-graph)
     (doseq [[k v] (seq realized-graph)]
       (i/expected keyword? "keyword node-ID for injectable" k))
+    ;; update last ns-prefix
+    (alter-var-root #'last-ns-prefix (fn [_] ns-prefix))
+    ;; proceed with creating injected vars
     (->> (seq realized-graph)
       (sort-by first)
       (group-by (comp namespace first))
@@ -185,7 +206,7 @@
                       (let [[exposed-keyword realized-val] (first coll)
                             varname-str (name exposed-keyword)]
                         (as-> (get var-graph exposed-keyword) $
-                          (meta $)
+                          (conj {} (and $ (t/iattrs $)) (meta $))
                           (with-meta (symbol varname-str) $)
                           (intern var-ns $ realized-val))                  ; create var
                         (recur (next coll) (conj nams (str ns-str \/ varname-str))))))))

@@ -178,3 +178,19 @@
     (throw (IllegalArgumentException.
              (format "Key %s not found in keys %s" k (try (sort (keys m))
                                                        (catch ClassCastException _ (keys m))))))))
+
+
+(defmacro when-let-multi
+  "Equivalent of `when-let` that accepts multiple binding forms."
+  [bindings & body]
+  (expected vector? "vector of binding forms" bindings)
+  (expected (comp even? count) "even number of binding forms" bindings)
+  (cond
+    (empty? bindings)      (with-meta `(do ~@body) (meta body))
+    (= 2 (count bindings)) `(when-let [~@bindings]
+                              ~@body)
+    :otherwise             `(when-let [~@(take 2 bindings)]
+                              (when-let-multi ~(->> bindings
+                                                 (drop 2)
+                                                 vec)
+                                ~@body))))
