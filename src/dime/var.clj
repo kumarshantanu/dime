@@ -138,7 +138,7 @@
 
 
 (defn sym->source
-  "Given ns/var/dependency symbols, return the corresponding source - fully-qualified var name as a string. If not
+  "Given ns/var/dependency symbols, return the corresponding source - fully-qualified var name as a symbol. If not
   found, return nil."
   [ns-sym var-sym dep-sym]
   (i/expected symbol? "ns symbol"  ns-sym)
@@ -169,9 +169,8 @@
                                 (str inj-ns \/)
                                 symbol
                                 find-var)
-                     inj-meta (meta inj-var)
-                     impl-id  (:impl-id inj-meta)]
-    (str impl-id)))
+                     inj-meta (meta inj-var)]
+    (:impl-id inj-meta)))
 
 
 (defn create-vars!
