@@ -170,6 +170,33 @@
                    `(~expose-syms (~name-sym ~@invoke-syms)))]))
 
 
+(defn injected-meta
+  "Given pre-injected meta, remove the injection metadata and return post-injection meta data."
+  [pre-meta {:keys [expose-meta-key
+                    inject-meta-key
+                    pre-inject-meta-key
+                    post-inject-meta-key]}]
+  (let [on-post-inject  (fn [the-meta] (if (contains? the-meta post-inject-meta-key)
+                                         (dissoc the-meta :arglists)  ; because we do not know what post-inject returns
+                                         the-meta))
+        remove-inj-meta (fn [args] (->> args
+                                     (take-while #(not= % '&))
+                                     (remove #(get (meta %) inject-meta-key))  ; remove truthy
+                                     vec))
+        update-arglists (fn [arglists]
+                          (->> arglists
+                            (map remove-inj-meta)
+                            doall))
+        update-argsmeta (fn [the-meta]
+                          (if (contains? the-meta :arglists)
+                            (update-in the-meta [:arglists] update-arglists)
+                            the-meta))]
+    (-> pre-meta
+      on-post-inject
+      (dissoc expose-meta-key pre-inject-meta-key post-inject-meta-key)
+      update-argsmeta)))
+
+
 (defn get-val
   "Given map m, find and return the value of key k. Throw IllegalArgumentException when specified key is not found."
   [m k]

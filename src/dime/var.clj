@@ -206,6 +206,10 @@
                             varname-str (name exposed-keyword)]
                         (as-> (get var-graph exposed-keyword) $
                           (conj {} (and $ (t/iattrs $)) (meta $))
+                          (i/injected-meta $ {:expose-meta-key      u/*expose-meta-key*
+                                              :inject-meta-key      u/*inject-meta-key*
+                                              :pre-inject-meta-key  u/*pre-inject-meta-key*
+                                              :post-inject-meta-key u/*post-inject-meta-key*})
                           (with-meta (symbol varname-str) $)
                           (intern var-ns $ realized-val))                  ; create var
                         (recur (next coll) (conj nams (str ns-str \/ varname-str))))))))
