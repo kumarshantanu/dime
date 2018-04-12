@@ -84,7 +84,7 @@ You would need the requires namespaces. See the snippet below:
 Discovering dependency graph is quite straightforward:
 
 ```clojure
-(def deps (dv/ns-vars->graph ['foo.db 'foo.service 'foo.web]))  ; scan namespaces for injectable vars
+(def graph (dv/ns-vars->graph ['foo.db 'foo.service 'foo.web]))  ; scan namespaces for injectable vars
 ```
 
 
@@ -100,7 +100,7 @@ Prepare seed data and invoke dependency resolution:
               :username "dbuser"
               :password "s3cr3t"}
         ;; `inject-all` resolves/injects dependencies, returning keys associated with partial functions
-        {:keys [web-create-order]} (di/inject-all deps seed)]
+        {:keys [web-create-order]} (di/inject-all graph seed)]
     ;; now `web-create-order` needs to be called with only `web-request`
     ...))
 ```
@@ -143,6 +143,62 @@ $ lein viz -s foo.init/viz-payload
 
 * Option `:pre-inject-processor` may be useful to `deref` the vars (for faster dispatch) before making a partial fn
 * Option `:post-inject-processor` may be useful to catch any exceptions arising from post-injection handlers
+
+
+#### Development support
+
+Once you realize a dependency graph, you can create injected vars for easy calling at the REPL:
+
+```clojure
+(dv/create-vars! (di/inject-all graph seed) {:var-graph graph})  ; create injected vars
+
+(dv/remove-vars! injected-vars)  ; accepts a list of var names (e.g. what create-vars! returns)
+```
+
+##### CIDER M-.
+
+Assuming you have called `create-vars!`, you can also have `M-.` (meta-dot, jump to source) support with CIDER.
+You need to put the following in your `init.el`:
+
+```elisp
+(defun cider-dime-var-info (f &rest args)
+  (or
+   ;; try DIME navigation
+   (ignore-errors
+     (let* (;; find the symbol at M-.
+            (sym-at-point (car args))
+            ;; find defn var name
+            (top-level-var (thread-first (cider-nrepl-sync-request:eval (cider-defun-at-point)
+                                                                        (cider-current-connection)
+                                                                        (cider-current-ns))
+                             (nrepl-dict-get  "value")
+                             (split-string "/")
+                             cadr))
+            ;; find source var symbol
+            (source-var-name
+             (when top-level-var
+               (thread-first (format "(dime.var/sym->source '%s '%s '%s)"
+                                     (cider-current-ns)
+                                     top-level-var
+                                     sym-at-point)
+                 (cider-nrepl-sync-request:eval)
+                 (nrepl-dict-get "value")))))
+       (when (and source-var-name
+                  (not (string-match-p "nil" source-var-name)))
+         ;; get var info of target fully-qualified var name
+         (let* ((source-var-pair (split-string source-var-name "/"))
+                (var-info (cider-nrepl-send-sync-request `("op" "info"
+                                                           "ns" ,(car source-var-pair)
+                                                           "symbol" ,(cadr source-var-pair)))))
+           (if (member "no-info" (nrepl-dict-get var-info "status"))
+               nil
+             var-info)))))
+   ;; else fallback on default behavior
+   (apply f args)))
+
+
+(advice-add #'cider-var-info :around #'cider-dime-var-info)
+```
 
 
 ## License
