@@ -13,7 +13,7 @@
   * [TODO] Visibility control for injectables per context
 
 
-## [WIP] 0.5.0 / 2018-April-??
+## 0.5.0-alpha1 / 2018-April-12
 
 * [TODO - BREAKING CHANGE] Drop support for Clojure 1.5, 1.6
 * Add support for creating/removing virtual namespaces with injected vars

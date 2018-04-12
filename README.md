@@ -10,7 +10,7 @@ creating partially applied functions in an inexpensive (boiler-plate free), most
 
 ## Usage
 
-Leiningen coordinates: `[dime "0.5.0-SNAPSHOT"]`
+Leiningen coordinates: `[dime "0.5.0-alpha1"]`
 
 
 ### Example
