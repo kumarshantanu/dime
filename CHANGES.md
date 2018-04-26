@@ -15,7 +15,8 @@
 
 ## 0.5.0-unreleased / 2018-April-??
 
-- Add `dime-cider.el` script for Emacs-CIDER `M-.` assistance
+* Add `dime-cider.el` script for Emacs-CIDER `M-.` assistance
+* Implement `clojure.lang.IFn/applyTo` in `definj`
 
 
 ## 0.5.0-alpha1 / 2018-April-12
@@ -26,7 +27,6 @@
   - `dime.var/remove-vars!`
   - `dime.var/sym->source` for tools: navigation support
 * [TODO] Instrumentation support for `definj`
-* [TODO] Implement `clojure.lang.IFn/applyTo` in `definj`
 * [TODO] Use same type hints in exposed fn dependencies/args as in original fns
 - [TODO] Overhaul documentation
 
