@@ -13,6 +13,11 @@
   * [TODO] Visibility control for injectables per context
 
 
+## 0.5.0-unreleased / 2018-April-??
+
+- Add `dime-cider.el` script for Emacs-CIDER `M-.` assistance
+
+
 ## 0.5.0-alpha1 / 2018-April-12
 
 * [TODO - BREAKING CHANGE] Drop support for Clojure 1.5, 1.6
