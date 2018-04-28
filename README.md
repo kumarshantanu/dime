@@ -25,7 +25,7 @@ repeatable and easy to reason about by implementing mostly-automated
 
 - Cascading dependencies
 - Overhead of tagging all dependencies
-- Not compatible with multimethods out of the box
+- Cannot inject in multimethods out of the box
 
 
 ### Other work
