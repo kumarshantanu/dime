@@ -28,7 +28,6 @@
   - `dime.var/sym->source` for tools: navigation support
 * [TODO] Instrumentation support for `definj`
 * [TODO] Use same type hints in exposed fn dependencies/args as in original fns
-- [TODO] Overhaul documentation
 
 
 ## 0.4.0 / 2016-November-24
