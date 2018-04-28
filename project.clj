@@ -4,6 +4,7 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :global-vars {*warn-on-reflection* true
+                *unchecked-math* :warn-on-boxed
                 *assert* true}
   :profiles {:provided {:dependencies [[org.clojure/clojure "1.5.1"]]}
              :dev {:dependencies [[org.clojure/tools.nrepl "0.2.10"]]}
