@@ -8,20 +8,20 @@ Dependency Injection Made Easy for Clojure.
 ## Rationale
 
 Initializing and wiring up components in a non-trivial application could be a complex and brittle affair.
-It could be stateful, repetitive, messy or all of these. Dime aims to make that process less error-prone,
+It could be stateful, repetitive, messy or all of those. Dime aims to make that process less error-prone,
 repeatable and easy to reason about by implementing mostly-automated
 [dependency injection/inversion](https://en.wikipedia.org/wiki/Dependency_inversion_principle).
 
 
 ### Goals
 
-- Easy, Push-model dependency injection in the large
+- Easy, push-model dependency injection in the large
 - Flexible and easy lifecycle management
 - Thorough testability, avoiding [pitfalls](http://charsequence.blogspot.in/2016/12/mocking-with-var-redefinition.html)
-- Avoid mutation as much as possible
+- Avoid mutation (except in development)
 
 
-### Known constraints (Trade off)
+### Caveats (Trade off)
 
 - Cascading dependencies
 - Overhead of tagging all dependencies
