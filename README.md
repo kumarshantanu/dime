@@ -4,7 +4,8 @@
 
 Dependency Injection Made Easy for Clojure.
 
-Dime implements [dependency injection/inversion](https://en.wikipedia.org/wiki/Dependency_inversion_principle) by
+Dime is an opinionated library that implements Push-model based
+[dependency injection/inversion](https://en.wikipedia.org/wiki/Dependency_inversion_principle) by
 creating partially applied functions in an inexpensive (boiler-plate free), mostly automated manner.
 
 
@@ -15,8 +16,8 @@ Leiningen coordinates: `[dime "0.5.0-alpha1"]`
 
 ### Example
 
-Consider a contrived order posting implementation with a decoupled design as shown below. You are supposed to write
-code in a similar fashion (with metadata tags) in your application for automatic injection.
+Consider a contrived order posting implementation with a decoupled design as shown below. The example code below
+declares the dependencies across functions (with metadata tags) for automatic dependency injection.
 
 
 #### Annotated functions
