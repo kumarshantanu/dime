@@ -23,6 +23,7 @@ repeatable and easy to reason about by implementing mostly-automated
 
 ### Caveats (Trade off)
 
+- Opinionated in favor of decoupling
 - Cascading dependencies
 - Overhead of tagging all dependencies
 - Cannot inject in multimethods out of the box
