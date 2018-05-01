@@ -1,4 +1,4 @@
-(defproject dime "0.5.0-alpha1"
+(defproject dime "0.5.0"
   :description "Dependency Injection Made Easy for Clojure"
   :url "https://github.com/kumarshantanu/dime"
   :license {:name "Eclipse Public License"

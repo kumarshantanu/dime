@@ -17,18 +17,14 @@
   * [TODO] Visibility control for injectables per context
 
 
-## 0.5.0-unreleased / 2018-April-??
-
-* Add `dime-cider.el` script for Emacs-CIDER `M-.` assistance
-* Implement `clojure.lang.IFn/applyTo` in `definj`
-
-
-## 0.5.0-alpha1 / 2018-April-12
+## 0.5.0 / 2018-May-01
 
 * Add support for creating/removing virtual namespaces with injected vars
   - `dime.var/create-vars!`
   - `dime.var/remove-vars!`
   - `dime.var/sym->source` for tools: navigation support
+* Implement `clojure.lang.IFn/applyTo` in `definj`
+* Add `dime-cider.el` script for Emacs-CIDER `M-.` assistance
 
 
 ## 0.4.0 / 2016-November-24
