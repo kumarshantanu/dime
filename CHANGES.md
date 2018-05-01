@@ -2,18 +2,33 @@
 
 ## TODO
 
-* [TODO] Support for `:expose` annotation to be associated with one or more keys
+* [TODO - BREAKING CHANGE] Drop support for Clojure 1.5, 1.6
+  * [Idea] Support for ClojureScript
+* [TODO] Instrumentation support for `definj`
+* [TODO] Use same type hints in exposed fn dependencies/args as in original fns
 * [TODO] Support for drop-in replacement for Clojure facilities
   * [TODO] `dime.dropin/defmulti` Support for multi-methods
-  * [TODO] `dime.dropin/defn` Support for non-declarative injection
+  * [TODO] `dime.dropin/defn` Support for non-declarative injection (scanning code)
 * [TODO] Annotate a var (args, inject, pre/post-inject) at runtime (3rd party code)
-* [TODO] Instrumentation support for `definj`
-* [TODO] Implement `clojure.lang.IFn/applyTo` in `definj`
-* [TODO] Use same type hints in exposed fn dependencies/args as in original fns
 * [TODO] Support for ClojureScript/ClojureCLR
 * [TODO] Introduce injection contexts
-  * [TODO] Identification mechanism for injectables per context
+  * [TODO] Support for `:expose` annotation to be associated with one or more keys
+  * [TODO] Identification mechanism for injectables per context, e.g. `:context [:db :global]`
   * [TODO] Visibility control for injectables per context
+
+
+## 0.5.0-unreleased / 2018-April-??
+
+* Add `dime-cider.el` script for Emacs-CIDER `M-.` assistance
+* Implement `clojure.lang.IFn/applyTo` in `definj`
+
+
+## 0.5.0-alpha1 / 2018-April-12
+
+* Add support for creating/removing virtual namespaces with injected vars
+  - `dime.var/create-vars!`
+  - `dime.var/remove-vars!`
+  - `dime.var/sym->source` for tools: navigation support
 
 
 ## 0.4.0 / 2016-November-24

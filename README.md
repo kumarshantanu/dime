@@ -4,19 +4,50 @@
 
 Dependency Injection Made Easy for Clojure.
 
-Dime implements [dependency injection/inversion](https://en.wikipedia.org/wiki/Dependency_inversion_principle) by
-creating partially applied functions in an inexpensive (boiler-plate free), mostly automated manner.
+
+## Rationale
+
+Initializing and wiring up components in a non-trivial application could be a complex and brittle affair.
+It could be stateful, repetitive, messy or all of those. Dime aims to make that process less error-prone,
+repeatable and easy to reason about by implementing mostly-automated
+[dependency injection/inversion](https://en.wikipedia.org/wiki/Dependency_inversion_principle).
+
+
+### Goals
+
+- Easy, push-model dependency injection in the large
+- Flexible and easy lifecycle management
+- Thorough testability, avoiding [pitfalls](http://charsequence.blogspot.in/2016/12/mocking-with-var-redefinition.html)
+- Avoid mutation (except in development)
+
+
+### Caveats (Trade off)
+
+- Opinionated in favor of decoupling
+- Cascading dependencies
+- Overhead of tagging all dependencies
+- Cannot inject in multimethods out of the box
+
+
+### Other work
+
+The following projects take different approaches to depenency management:
+
+- [Component](https://github.com/stuartsierra/component)
+- [Mount](https://github.com/tolitius/mount)
+- [Mount-lite](https://github.com/aroemers/mount-lite)
+- [Integrant](https://github.com/weavejester/integrant)
 
 
 ## Usage
 
-Leiningen coordinates: `[dime "0.4.0"]`
+Leiningen coordinates: `[dime "0.5.0-alpha1"]`
 
 
 ### Example
 
-Consider a contrived order posting implementation with a decoupled design as shown below. You are supposed to write
-code in a similar fashion (with metadata tags) in your application for automatic injection.
+Consider a contrived order posting implementation with a decoupled design as shown below. The example code
+below declares the dependencies across functions (with metadata tags) for automatic dependency injection.
 
 
 #### Annotated functions
@@ -30,18 +61,18 @@ Notice the meta data tags (`:expose`, `:inject`, `:post-inject`) used in the cod
   (:require
     [dime.util :as du]))
 
-(defn ^{:expose :connection-pool
+(defn ^{:expose :connection-pool             ; expose as :connection-pool in dependency graph
         :post-inject du/post-inject-invoke}  ; execute fn to obtain connection-pool
       make-conn-pool
   [^:inject db-host ^:inject db-port ^:inject username ^:inject password]
   :dummy-pool)
 
-(defn ^{:expose :find-items} db-find-items
-  [^:inject connection-pool item-ids]
+(defn ^{:expose :find-items} db-find-items   ; expose as :find-items in dependency graph
+  [^:inject connection-pool item-ids]        ; lookup/inject :connection-pool from dependency graph
   {:items item-ids})
 
-(defn db-create-order
-  [^:inject connection-pool order-data]
+(defn db-create-order                        ; expose as :db-create-order in dependency graph
+  [^:inject connection-pool order-data]      ; lookup/inject :connection-pool from dependency graph
   {:created-order order-data})
 
 ;; ---------------- in namespace foo.service ----------------
@@ -54,7 +85,7 @@ Notice the meta data tags (`:expose`, `:inject`, `:post-inject`) used in the cod
 
 ;; ---------------- in namespace foo.web ----------------
 
-(defn ^:expose find-user  ; vars must have at least one inject annotation to participate in dependency discovery
+(defn ^:expose find-user  ; must have at least one DIME annotation for dependency discovery
   [session]
   :dummy-user)
 
@@ -84,7 +115,7 @@ You would need the requires namespaces. See the snippet below:
 Discovering dependency graph is quite straightforward:
 
 ```clojure
-(def deps (dv/ns-vars->graph ['foo.db 'foo.service 'foo.web]))  ; scan namespaces for injectable vars
+(def graph (dv/ns-vars->graph ['foo.db 'foo.service 'foo.web]))  ; scan namespaces for injectable vars
 ```
 
 
@@ -100,7 +131,7 @@ Prepare seed data and invoke dependency resolution:
               :username "dbuser"
               :password "s3cr3t"}
         ;; `inject-all` resolves/injects dependencies, returning keys associated with partial functions
-        {:keys [web-create-order]} (di/inject-all deps seed)]
+        {:keys [web-create-order]} (di/inject-all graph seed)]
     ;; now `web-create-order` needs to be called with only `web-request`
     ...))
 ```
@@ -145,9 +176,26 @@ $ lein viz -s foo.init/viz-payload
 * Option `:post-inject-processor` may be useful to catch any exceptions arising from post-injection handlers
 
 
+#### Development support
+
+Once you realize a dependency graph, you can create injected vars for easy calling at the REPL:
+
+```clojure
+(dv/create-vars! (di/inject-all graph seed) {:var-graph graph})  ; create injected vars
+
+(dv/remove-vars! injected-vars)  ; accepts a list of var names (e.g. what create-vars! returns)
+```
+
+##### CIDER M-.
+
+Assuming you have called `dime.var/create-vars!` with `{:var-graph graph}` option, you can also have `M-.` (meta-dot,
+jump to source) support with CIDER. You can include the contents of (or call) [`dime-cider.el`](dime-cider.el) in your
+`init.el` file.
+
+
 ## License
 
-Copyright © 2016 Shantanu Kumar (kumar.shantanu@gmail.com, shantanu.kumar@concur.com)
+Copyright © 2016-2018 Shantanu Kumar (kumar.shantanu@gmail.com, shantanu.kumar@concur.com)
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.

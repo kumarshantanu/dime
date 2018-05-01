@@ -113,6 +113,34 @@
           inj-deps (fn [m] (if (get m u/*inject-meta-key*)
                              m
                              (assoc m u/*inject-meta-key* true)))
+          apply-to (let [args (gensym "var-args-")
+                         anth (fn [n]
+                                (->> (range n)
+                                  (map (fn [i] `(nth ~args ~i)))))]
+                     `(applyTo [this# ~args]
+                        (case (count ~args)
+                          0  (.invoke this#)
+                          1  (.invoke this# (first ~args))
+                          2  (.invoke this# (first ~args) (second ~args))
+                          3  (.invoke this# ~@(anth 3))
+                          4  (.invoke this# ~@(anth 4))
+                          5  (.invoke this# ~@(anth 5))
+                          6  (.invoke this# ~@(anth 6))
+                          7  (.invoke this# ~@(anth 7))
+                          8  (.invoke this# ~@(anth 8))
+                          9  (.invoke this# ~@(anth 9))
+                          10 (.invoke this# ~@(anth 10))
+                          11 (.invoke this# ~@(anth 11))
+                          12 (.invoke this# ~@(anth 12))
+                          13 (.invoke this# ~@(anth 13))
+                          14 (.invoke this# ~@(anth 14))
+                          15 (.invoke this# ~@(anth 15))
+                          16 (.invoke this# ~@(anth 16))
+                          17 (.invoke this# ~@(anth 17))
+                          18 (.invoke this# ~@(anth 18))
+                          19 (.invoke this# ~@(anth 19))
+                          20 (.invoke this# ~@(anth 20))
+                          (.invoke this# ~@(anth 20) (object-array (drop 20 ~args))))))
           matching (map (fn [[args & body]]
                        (let [arg-syms (repeatedly (count args) (partial gensym "arg-"))
                              bindings (interleave args arg-syms)]
@@ -130,6 +158,7 @@
       `(let [post-inj# (get ~sym-meta ~(do u/*post-inject-meta-key*) u/post-inject-identity)]
          (defrecord ~sym ~deps
            clojure.lang.IFn
+           ~apply-to
            ~@matching
            ~@no-match)
          ;; update metadata to make it look like a defn var

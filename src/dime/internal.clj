@@ -109,38 +109,40 @@
 (defn arg-info
   "Return a map of argument info. Helper for `inject-prepare`."
   [inject-meta-key arg]
-  (let [info-map (fn [injector-fn inject-keys]
+  (let [info-map (fn [injector-fn inject-syms inject-keys]
                    {:arg arg
                     :sym (gensym (if injector-fn "inject-" "arg-"))
                     :injector-fn injector-fn  ; non-nil injector-fn implies injectable dependency
+                    :inject-syms inject-syms
                     :inject-keys inject-keys})
         no-infer (fn [a] (throw (ex-info (str "Cannot infer inject key for argument " (pr-str a))
                                   {:argument a})))]
     (if-let [inject-tag (get (meta arg) inject-meta-key)]
       (if (true? inject-tag)
         (cond
-          (symbol? arg)       (info-map (fn [ks vs] (first vs)) [(keyword arg)])
-          (and (vector? arg)) (->> (take-while (complement #{'& :as}) arg)
-                                (map (fn [param]
-                                       (let [inject-name (get (meta param) inject-meta-key)]
-                                         (expected (comp not false?) "non-false :inject tag"
-                                           inject-name)
-                                         (if (and inject-name (not (true? inject-name)))
-                                           inject-name
-                                           (if (symbol? param)
-                                             (keyword param)
-                                             (no-infer param))))))
-                                (info-map (fn [ks vs] (vec vs))))
-          (and (map? arg))    (->> (seq arg)
-                                (filter (comp not keyword? first))
-                                (map second)
-                                (concat (map keyword (:keys arg)))
-                                (concat (map symbol (:syms arg)))
-                                (concat (map str (:strs arg)))
-                                (info-map zipmap))
-          :otherwise          (no-infer arg))
-        (info-map (fn [ks vs] (first vs)) [inject-tag]))
-      (info-map nil nil))))
+          (symbol? arg) (info-map (fn [ks vs] (first vs)) [arg] [(keyword arg)])
+          (vector? arg) (let [fixed-args (take-while (complement #{'& :as}) arg)]
+                          (->> fixed-args
+                            (map (fn [param]
+                                   (let [inject-name (get (meta param) inject-meta-key)]
+                                     (expected (comp not false?) "non-false :inject tag"
+                                       inject-name)
+                                     (if (and inject-name (not (true? inject-name)))
+                                       inject-name
+                                       (if (symbol? param)
+                                         (keyword param)
+                                         (no-infer param))))))
+                            (info-map (fn [ks vs] (vec vs)) fixed-args)))
+          (map? arg)    (->> (seq arg)
+                          (filter (comp not keyword? first))
+                          (concat (map (juxt (comp symbol name) keyword) (:keys arg)))
+                          (concat (map (juxt (comp symbol name) symbol)  (:syms arg)))
+                          (concat (map (juxt identity           str)     (:strs arg)))
+                          ((juxt #(mapv first %) #(mapv second %))) ; extra-parens=invoke
+                          (apply info-map zipmap))
+          :otherwise    (no-infer arg))
+        (info-map (fn [ks vs] (first vs)) [arg] [inject-tag]))
+      (info-map nil nil nil))))
 
 
 (defn inject-prepare
@@ -168,6 +170,33 @@
                    `(~expose-syms (~name-sym ~@invoke-syms)))]))
 
 
+(defn injected-meta
+  "Given pre-injected meta, remove the injection metadata and return post-injection meta data."
+  [pre-meta {:keys [expose-meta-key
+                    inject-meta-key
+                    pre-inject-meta-key
+                    post-inject-meta-key]}]
+  (let [on-post-inject  (fn [the-meta] (if (contains? the-meta post-inject-meta-key)
+                                         (dissoc the-meta :arglists)  ; because we do not know what post-inject returns
+                                         the-meta))
+        remove-inj-meta (fn [args] (->> args
+                                     (take-while #(not= % '&))
+                                     (remove #(get (meta %) inject-meta-key))  ; remove truthy
+                                     vec))
+        update-arglists (fn [arglists]
+                          (->> arglists
+                            (map remove-inj-meta)
+                            doall))
+        update-argsmeta (fn [the-meta]
+                          (if (contains? the-meta :arglists)
+                            (update-in the-meta [:arglists] update-arglists)
+                            the-meta))]
+    (-> pre-meta
+      on-post-inject
+      (dissoc expose-meta-key pre-inject-meta-key post-inject-meta-key)
+      update-argsmeta)))
+
+
 (defn get-val
   "Given map m, find and return the value of key k. Throw IllegalArgumentException when specified key is not found."
   [m k]
@@ -176,3 +205,19 @@
     (throw (IllegalArgumentException.
              (format "Key %s not found in keys %s" k (try (sort (keys m))
                                                        (catch ClassCastException _ (keys m))))))))
+
+
+(defmacro when-let-multi
+  "Equivalent of `when-let` that accepts multiple binding forms."
+  [bindings & body]
+  (expected vector? "vector of binding forms" bindings)
+  (expected (comp even? count) "even number of binding forms" bindings)
+  (cond
+    (empty? bindings)      (with-meta `(do ~@body) (meta body))
+    (= 2 (count bindings)) `(when-let [~@bindings]
+                              ~@body)
+    :otherwise             `(when-let [~@(take 2 bindings)]
+                              (when-let-multi ~(->> bindings
+                                                 (drop 2)
+                                                 vec)
+                                ~@body))))

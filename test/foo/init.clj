@@ -19,6 +19,12 @@
                                'foo.db]))
 
 
+(def seed {:db-host "localhost"
+           :db-port 3306
+           :username "dbuser"
+           :password "s3cr3t"})
+
+
 (defn viz-payload
   []
   {:graph-data  (di/attr-map graph :dep-ids)
