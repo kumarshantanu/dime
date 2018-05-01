@@ -2,6 +2,10 @@
 
 ## TODO
 
+* [TODO - BREAKING CHANGE] Drop support for Clojure 1.5, 1.6
+  * [Idea] Support for ClojureScript
+* [TODO] Instrumentation support for `definj`
+* [TODO] Use same type hints in exposed fn dependencies/args as in original fns
 * [TODO] Support for drop-in replacement for Clojure facilities
   * [TODO] `dime.dropin/defmulti` Support for multi-methods
   * [TODO] `dime.dropin/defn` Support for non-declarative injection (scanning code)
@@ -21,13 +25,10 @@
 
 ## 0.5.0-alpha1 / 2018-April-12
 
-* [TODO - BREAKING CHANGE] Drop support for Clojure 1.5, 1.6
 * Add support for creating/removing virtual namespaces with injected vars
   - `dime.var/create-vars!`
   - `dime.var/remove-vars!`
   - `dime.var/sym->source` for tools: navigation support
-* [TODO] Instrumentation support for `definj`
-* [TODO] Use same type hints in exposed fn dependencies/args as in original fns
 
 
 ## 0.4.0 / 2016-November-24
