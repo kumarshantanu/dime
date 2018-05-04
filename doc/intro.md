@@ -9,6 +9,23 @@ Consider a contrived order posting implementation with a decoupled design as sho
 below declares the dependencies across functions (with metadata tags) for automatic dependency injection.
 
 
+### Understanding injection annotations
+
+Dime supports var metadata to specify injection attributes: `:expose`, `:inject`, `:post-inject`.
+Let us try to understand the attribute correlation first. When unspecified, Dime assumes the
+attribute name to be the same as the keywordized equivalent of the symbol (see below).
+
+```clojure
+(defn ^{:expose :bar} foo   ; fn foo is exposed as :bar in injection context
+  [^:inject quux]           ; same as `^{:inject :quux} quux` (inferred)
+  ...)
+
+(defn baz                   ; exposed as `^{:expose :baz} baz` (inferred)
+  [^{:inject :bar} x a b]   ; partially applied foo (exposed as :bar) injected as x
+  ...)
+```
+
+
 ### Annotated functions
 
 Notice the meta data tags (`:expose`, `:inject`, `:post-inject`) used in the code.
@@ -24,6 +41,7 @@ Notice the meta data tags (`:expose`, `:inject`, `:post-inject`) used in the cod
         :post-inject du/post-inject-invoke}  ; execute fn to obtain connection-pool
       make-conn-pool
   [^:inject db-host ^:inject db-port ^:inject username ^:inject password]
+  ;; or simply [^:inject {:keys [db-host db-port username password]}]
   :dummy-pool)
 
 (defn ^{:expose :find-items} db-find-items   ; expose as :find-items in dependency graph
