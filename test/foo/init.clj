@@ -31,3 +31,15 @@
    :node-labels (di/attr-map graph #(str (:node-id %) \newline (:impl-id %)))
    :node-shapes (di/attr-map graph #(when (du/is-or-has? (:post-inj %) du/post-inject-invoke)
                                       :rectangle))})
+
+
+(defn -main
+  []
+  ;; `inject-all` resolves/injects dependencies,
+  ;; returning exposed keys associated with partially applied functions
+  (let [{:keys [web-create-order]} (di/inject-all graph seed)]
+    ;; now `web-create-order` can be invoked with just one argument
+    (println
+      (web-create-order {:uri "/create/1234"
+                         :request-method :post
+                         :body "item=sealring&partno=6789"}))))
