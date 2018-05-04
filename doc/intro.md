@@ -41,7 +41,8 @@ Notice the meta data tags (`:expose`, `:inject`, `:post-inject`) used in the cod
         :post-inject du/post-inject-invoke}  ; execute fn to obtain connection-pool
       make-conn-pool
   [^:inject db-host ^:inject db-port ^:inject username ^:inject password]
-  ;; or simply [^:inject {:keys [db-host db-port username password]}]
+  ;; or concisely [^:inject {:keys [db-host db-port username password]}]
+  ;; Dime supports both styles above, but those are different signatures
   :dummy-pool)
 
 (defn ^{:expose :find-items} db-find-items   ; expose as :find-items in dependency graph
