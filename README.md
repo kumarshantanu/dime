@@ -49,6 +49,13 @@ Clojars coordinates: `[dime "0.5.0"]`
 
 See [Documentation](doc/intro.md)
 
+
+## Discuss
+
+Slack channel: [#dime](https://clojurians.slack.com/messages/CAJUKHCG0/) (you need an invitation from
+http://clojurians.net/ to join the Clojurian Slack team)
+
+
 ## Development
 
 Running tests:
