@@ -35,10 +35,11 @@ Notice the meta data tags (`:expose`, `:inject`, `:post-inject`) used in the cod
 
 (ns foo.db
   (:require
-    [dime.util :as du]))
+    [dime.var :as dv :refer [defconst]]))
 
-(defn ^{:expose :connection-pool             ; expose as :connection-pool in dependency graph
-        :post-inject du/post-inject-invoke}  ; execute fn to obtain connection-pool
+;; defconst creates a singleton by invoking fully injected arity-0 fn,
+;; shorthand for metadata {:post-inject dime.util/post-inject-invoke}
+(defconst ^{:expose :connection-pool}  ; expose as :connection-pool in dependency graph
       make-conn-pool
   [^:inject db-host ^:inject db-port ^:inject username ^:inject password]
   ;; or concisely [^:inject {:keys [db-host db-port username password]}]

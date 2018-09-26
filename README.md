@@ -43,7 +43,7 @@ The following projects take different approaches to dependency management:
 
 ## Usage
 
-Clojars coordinates: `[dime "0.5.0"]`
+Clojars coordinates: `[dime "0.5.1"]`
 
 
 See [Documentation](doc/intro.md)

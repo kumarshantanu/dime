@@ -17,7 +17,7 @@
   * [TODO] Visibility control for injectables per context
 
 
-## [WIP] 0.5.1 / 2018-September-??
+## 0.5.1 / 2018-September-26
 
 * Add macro `dime.var/defconst` as a shorthand to create singletons
   - All arguments must be injected
