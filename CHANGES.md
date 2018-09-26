@@ -19,7 +19,7 @@
 
 ## [WIP] 0.5.1 / 2018-September-??
 
-* [Todo] Add macro `dime.var/defconst` as a shorthand to create singletons
+* Add macro `dime.var/defconst` as a shorthand to create singletons
   - All arguments must be injected
 
 

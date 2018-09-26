@@ -19,6 +19,7 @@
 
 (deftest test-vars-inject
   (let [di-graph (dv/vars->graph [#'foo.db/make-conn-pool
+                                  #'foo.db/make-conn-pool2
                                   #'foo.db/db-find-items
                                   #'foo.db/db-create-order])
         seed-map {:db-host "localhost"
@@ -31,7 +32,7 @@
             {:keys [connection-pool
                     db-create-order
                     find-items]} injected]
-        (is (= 1 @foo.db/init-count) "Initialization must happen exactly once")
+        (is (= 2 @foo.db/init-count) "Initialization must happen exactly twice")
         (is (= :dummy-pool                 connection-pool))
         (is (= {:items :dummy}             (find-items :dummy)))
         (is (= {:created-order :dummy}     (db-create-order :dummy)))
@@ -43,7 +44,7 @@
             {:keys [connection-pool
                     db-create-order
                     find-items]} injected]
-        (is (= 1 @foo.db/init-count) "Initialization must happen exactly once")
+        (is (= 2 @foo.db/init-count) "Initialization must happen exactly twice")
         (with-redefs [foo.db/db-create-order (constantly :foo)]
           (is (= {:created-order :dummy} (db-create-order :dummy)) "Var must be dissociated with partial"))))))
 
@@ -66,7 +67,7 @@
                     service-browse-items
                     web-create-order]} injected
             service-create-order (:svc/create-order injected)]
-        (is (= 1 @foo.db/init-count) "Initialization must happen exactly once")
+        (is (= 2 @foo.db/init-count) "Initialization must happen exactly twice")
         (is (= :dummy-pool                 connection-pool))
         (is (= :dummy-cache                items-cache))
         (is (= {:items :mock-items}        (service-browse-items :dummy-user-id)))
@@ -86,7 +87,7 @@
                     find-items
                     service-create-order
                     web-create-order]} injected]
-        (is (= 1 @foo.db/init-count) "Initialization must happen exactly once")
+        (is (= 2 @foo.db/init-count) "Initialization must happen exactly twice")
         (with-redefs [foo.db/db-create-order (constantly :foo)]
           (is (= {:created-order :dummy} (db-create-order :dummy)) "Var must be dissociated with partial"))))))
 

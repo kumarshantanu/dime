@@ -10,7 +10,8 @@
 (ns foo.db
   (:require
     [dime.core :as di]
-    [dime.util :as du]))
+    [dime.util :as du]
+    [dime.var  :as dv]))
 
 
 (def init-count (atom 0))
@@ -24,6 +25,14 @@
   :dummy-pool)
 
 
+(dv/defconst ^{:expose :connection-pool2}
+             make-conn-pool2
+  "This is a factory function."
+  [^:inject db-host ^:inject db-port ^:inject username ^:inject password]
+  (swap! init-count inc)
+  :dummy-pool2)
+
+
 (di/definj ^{:post-inject du/post-inject-invoke} items-cache
   [connection-pool]
   []
@@ -31,10 +40,10 @@
 
 
 (defn ^{:expose :find-items} db-find-items
-  [^:inject connection-pool item-ids]
+  [^:inject connection-pool ^:inject connection-pool2 item-ids]
   {:items item-ids})
 
 
 (defn db-create-order
-  [^:inject connection-pool order-data]
+  [^:inject connection-pool ^:inject connection-pool2 order-data]
   {:created-order order-data})

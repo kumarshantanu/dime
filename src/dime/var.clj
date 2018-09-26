@@ -231,3 +231,24 @@
                (ns-unalias ns-sym (symbol each-varname-str)))  ; remove each var
              (remove-ns ns-sym))))                             ; remove the namespace
     dorun))
+
+
+(defmacro defconst
+  "Define a function (like with clojure.core/defn) to create a singleton. All arguments must be inject-annotated."
+  [sym & more]
+  (i/expected symbol? "a var-name symbol" sym)
+  (if-let [tokens (->> more
+                    (drop-while (complement (some-fn vector? list?)))
+                    seq)]
+    (let [forms (if (vector? (first tokens))
+                  (list tokens)  ; single-arity fn with one body, so wrap it as a list of bodies
+                  tokens)]
+      (doseq [each-form forms]
+        (i/expected (some-fn seq? list?) "body form as a list" each-form)
+        (i/expected vector? (str "argument vector in body form " each-form) (first each-form))
+        (doseq [each-arg (first each-form)]
+          (i/expected #(get (meta %) u/*inject-meta-key*)
+            (format "argument to be annotated with '%s' metadata key" u/*inject-meta-key*) each-arg)))
+      `(defn ~(vary-meta sym assoc u/*post-inject-meta-key* u/post-inject-invoke)
+         ~@more))
+    (throw (IllegalArgumentException. (str "Cannot find argument vector or body forms: " more)))))
