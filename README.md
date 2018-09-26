@@ -3,9 +3,8 @@
 [![Build Status](https://travis-ci.org/kumarshantanu/dime.svg)](https://travis-ci.org/kumarshantanu/dime)
 
 Dependency Injection Made Easy for Clojure.
-
 [This blog post](https://medium.com/@kumarshantanu/dependency-injection-with-clojure-using-dime-af57b140bd3f)
-explains the premise for this opinionated library.
+explains the premise.
 
 
 ## Rationale
@@ -18,7 +17,7 @@ repeatable and easy to reason about by implementing mostly-automated
 
 ### Goals
 
-- Easy, push-model dependency injection in the large
+- Easy, push-model dependency injection
 - Flexible and easy lifecycle management
 - Thorough testability, avoiding [pitfalls](http://charsequence.blogspot.in/2016/12/mocking-with-var-redefinition.html)
 - Avoid mutation (except in development)
@@ -34,7 +33,7 @@ repeatable and easy to reason about by implementing mostly-automated
 
 ### Other work
 
-The following projects take different approaches to depenency management:
+The following projects take different approaches to dependency management:
 
 - [Component](https://github.com/stuartsierra/component)
 - [Mount](https://github.com/tolitius/mount)
