@@ -173,6 +173,7 @@
 (defn injected-meta
   "Given pre-injected meta, remove the injection metadata and return post-injection meta data."
   [pre-meta {:keys [expose-meta-key
+                    expose-private-key
                     inject-meta-key
                     pre-inject-meta-key
                     post-inject-meta-key]}]
@@ -193,7 +194,7 @@
                             the-meta))]
     (-> pre-meta
       on-post-inject
-      (dissoc expose-meta-key pre-inject-meta-key post-inject-meta-key)
+      (dissoc expose-meta-key expose-private-key pre-inject-meta-key post-inject-meta-key)
       update-argsmeta)))
 
 

@@ -76,6 +76,12 @@ Notice the meta data tags (`:expose`, `:inject`, `:post-inject`) used in the cod
     {:response :dummy-response}))
 ```
 
+#### Private exposure
+
+You may want to expose some vars for dependency injection, but do not want to include them in the
+final injected graph. For such cases, annotate the var with `:expose-` (implying _private_, like
+`clojure.core/defn-`) instead of the `:expose` metadata key.
+
 
 ### Requiring namespaces
 

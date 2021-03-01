@@ -1,7 +1,8 @@
+dist: bionic
 language: clojure
 jdk:
-  - oraclejdk7
-  - oraclejdk8
+  - openjdk8
+  - openjdk11
 script:
   - lein with-profile c05 test
   - lein with-profile c06 test

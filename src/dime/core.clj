@@ -223,38 +223,47 @@
                 :as options}]
     (i/expected map? "a dependency graph as a map" graph)
     (i/expected map? "seed data to begin injection" seed)
-    (reduce (fn inject-one [m [k injectable]]
-              (let [post-inject (fn [m p] (-> (.-post-inj ^InjectableAttributes (t/iattrs injectable))
-                                            (post-inject-processor p k m)))
-                    inject-deps (fn [m] (if (contains? m k)         ; avoid duplicate resolution
-                                          m
-                                          (->> options              ; propagate options for `pre-inject` processing
-                                            (inject injectable m)
-                                            (post-inject m)
-                                            (assoc m k))))]
-                (->> (.-dep-ids ^InjectableAttributes
-                                (t/iattrs injectable))              ; find dependencies of each injectable
-                  (map (fn [each-dep-key]                           ; verify each dependency exists in seed/graph
-                         (when-not (or (contains? seed each-dep-key)
-                                     (contains? graph each-dep-key))
-                           (i/expected (format "dependency %s (for %s %s) to exist among seed/graph keys"
-                                         each-dep-key k injectable)
-                             {:seed-keys (keys seed)
-                              :graph-keys (keys graph)}))
-                         each-dep-key))
-                  (reduce (fn [mseed each-dep-key]
-                            (cond
-                              (contains? mseed each-dep-key) mseed  ; avoid duplicate resolution
-                              (contains? graph each-dep-key) (->> [each-dep-key (get graph each-dep-key)]
-                                                               (inject-one mseed)
-                                                               (merge mseed))
-                              :otherwise
-                              (i/expected (format "key %s to exist among resolvable keys" each-dep-key)
-                                {:resolved-keys (keys mseed)
-                                 :graph-keys (keys graph)})))
-                    m)
-                  inject-deps)))
-      seed graph))
+    (->> graph
+      (reduce (fn inject-one [m [k injectable]]
+                (let [post-inject (fn [m p] (-> (.-post-inj ^InjectableAttributes (t/iattrs injectable))
+                                              (post-inject-processor p k m)))
+                      inject-deps (fn [m] (if (contains? m k)         ; avoid duplicate resolution
+                                            m
+                                            (->> options              ; propagate options for `pre-inject` processing
+                                              (inject injectable m)
+                                              (post-inject m)
+                                              (assoc m k))))]
+                  (->> (.-dep-ids ^InjectableAttributes
+                                  (t/iattrs injectable))              ; find dependencies of each injectable
+                    (map (fn [each-dep-key]                           ; verify each dependency exists in seed/graph
+                           (when-not (or (contains? seed each-dep-key)
+                                       (contains? graph each-dep-key))
+                             (i/expected (format "dependency %s (for %s %s) to exist among seed/graph keys"
+                                           each-dep-key k injectable)
+                               {:seed-keys (keys seed)
+                                :graph-keys (keys graph)}))
+                           each-dep-key))
+                    (reduce (fn [mseed each-dep-key]
+                              (cond
+                                (contains? mseed each-dep-key) mseed  ; avoid duplicate resolution
+                                (contains? graph each-dep-key) (->> [each-dep-key (get graph each-dep-key)]
+                                                                 (inject-one mseed)
+                                                                 (merge mseed))
+                                :otherwise
+                                (i/expected (format "key %s to exist among resolvable keys" each-dep-key)
+                                  {:resolved-keys (keys mseed)
+                                   :graph-keys (keys graph)})))
+                      m)
+                    inject-deps)))
+        seed)
+      (reduce (fn remove-private [result [k injected]]
+                (if (and (contains? graph k)
+                      (-> (get graph k)
+                        t/iattrs
+                        :private?))  ; see dime.var ns - extending dime.type/Injectable to vars
+                  result
+                  (assoc result k injected)))
+        {})))
   ([graph seed]
     (inject-all graph seed {})))
 

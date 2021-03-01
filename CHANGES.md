@@ -15,6 +15,19 @@
   * [TODO] Support for `:expose` annotation to be associated with one or more keys
   * [TODO] Identification mechanism for injectables per context, e.g. `:context [:db :global]`
   * [TODO] Visibility control for injectables per context
+* [Idea] Pervasive support for private exposure
+  - dime.core/definj
+  - dime.var/defconst
+
+
+## [WIP] 0.5.2 / 2021-March-??
+
+* Fix #2 - Add the ability to mark injectables as non-public
+  - Expose vars privately with metadata key `:expose-` (instead of `:expose`)
+  - Add dynamic var `dime.util/*expose-private-key*` as private-exposure meta key
+* Documentation
+  - Documentation for private exposure
+  - Cljdoc badge
 
 
 ## 0.5.1 / 2018-September-26

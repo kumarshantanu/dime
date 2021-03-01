@@ -1,6 +1,7 @@
 # dime
 
 [![Build Status](https://travis-ci.org/kumarshantanu/dime.svg)](https://travis-ci.org/kumarshantanu/dime)
+[![cljdoc badge](https://cljdoc.org/badge/dime/dime)](https://cljdoc.org/d/dime/dime)
 
 Dependency Injection Made Easy for Clojure.
 [This blog post](https://medium.com/@kumarshantanu/dependency-injection-with-clojure-using-dime-af57b140bd3f)
@@ -26,7 +27,7 @@ repeatable and easy to reason about by implementing mostly-automated
 ### Caveats (Trade off)
 
 - Opinionated in favor of decoupling
-- Cascading dependencies
+- Cascading dependencies (minimize with _Onion Architecture_ or _Functional Core, Imperative Shell_ approach)
 - Overhead of tagging all dependencies
 - Cannot inject in multimethods out of the box
 
@@ -66,7 +67,7 @@ $ lein do clean, test       # run tests in lowest supported Clojure version
 
 ## License
 
-Copyright © 2016-2018 Shantanu Kumar (kumar.shantanu@gmail.com, shantanu.kumar@concur.com)
+Copyright © 2016-2021 Shantanu Kumar
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.

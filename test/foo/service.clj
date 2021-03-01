@@ -22,7 +22,7 @@
 (def recommend-products nil)
 
 
-(defn ^{:expose true
+(defn ^{:expose- true
         :post-inject (du/post-inject-alter #'recommend-products)}
       recommend-products-impl
   "Return item IDs for specified user ID."

@@ -79,6 +79,11 @@
         (is (= {:response :dummy-response} (web-create-order {})))
         (with-redefs [foo.db/db-create-order (constantly :foo)]
           (is (= :foo (db-create-order :dummy)) "Var must be associated with partial"))))
+    (testing "private :expose-"
+      (reset! foo.db/init-count 0)
+      (let [injected (di/inject-all di-graph seed-map)]
+        (is (not (contains? injected :recommend-products-impl)) "private exposed var is excluded")
+        (is (contains? injected :svc/create-order) "regular (non-private) exposed var is included")))
     (testing "pre-inject dissociates from var"
       (reset! foo.db/init-count 0)
       (let [injected (di/inject-all di-graph seed-map {:pre-inject-processor (fn [pre-inject the-var args] @the-var)})
