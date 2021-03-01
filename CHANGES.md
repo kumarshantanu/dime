@@ -27,7 +27,7 @@
   - Add dynamic var `dime.util/*expose-private-key*` as private-exposure meta key
 * [Todo] Documentation
   - Documentation for private exposure
-  - Cljdoc badge
+  - [Todo] Cljdoc badge
 
 
 ## 0.5.1 / 2018-September-26
