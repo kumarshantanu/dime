@@ -27,7 +27,7 @@ repeatable and easy to reason about by implementing mostly-automated
 ### Caveats (Trade off)
 
 - Opinionated in favor of decoupling
-- Cascading dependencies
+- Cascading dependencies (minimize with _Onion Architecture_ or _Functional Core, Imperative Shell_ approach)
 - Overhead of tagging all dependencies
 - Cannot inject in multimethods out of the box
 
