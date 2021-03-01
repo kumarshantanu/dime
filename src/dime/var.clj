@@ -32,12 +32,15 @@
                           (->> (:arglists var-meta)
                             (apply concat)
                             (some #(get (meta %) u/*inject-meta-key*))
-                            (or (get var-meta u/*expose-meta-key*))))))
+                            (or (get var-meta u/*expose-meta-key*))
+                            (or (get var-meta u/*expose-private-key*))))))
   (iattrs   [the-var] (when (t/valid? the-var)
                         (let [var-meta (meta the-var)]
                           (t/map->InjectableAttributes
-                            {:node-id  (let [ek (get var-meta u/*expose-meta-key*)]
+                            {:node-id  (let [ek (or (get var-meta u/*expose-meta-key*)
+                                                  (get var-meta u/*expose-private-key*))]
                                          (if (or (true? ek) (nil? ek)) (keyword (:name var-meta)) ek))
+                             :private? (boolean (get var-meta u/*expose-private-key*))
                              :impl-id  (symbol (str (.getName ^Namespace (:ns var-meta)) \/ (:name var-meta)))
                              :dep-ids  (->> (:arglists var-meta)
                                          (map (partial i/inject-prepare u/*inject-meta-key* the-var))
@@ -207,6 +210,7 @@
                         (as-> (get var-graph exposed-keyword) $
                           (conj {} (and $ (t/iattrs $)) (meta $))
                           (i/injected-meta $ {:expose-meta-key      u/*expose-meta-key*
+                                              :expose-private-key   u/*expose-private-key*
                                               :inject-meta-key      u/*inject-meta-key*
                                               :pre-inject-meta-key  u/*pre-inject-meta-key*
                                               :post-inject-meta-key u/*post-inject-meta-key*})
