@@ -20,7 +20,7 @@
   - dime.var/defconst
 
 
-## [WIP] 0.5.2 / 2021-March-??
+## 0.5.2 / 2021-March-01
 
 * Fix #2 - Add the ability to mark injectables as non-public
   - Expose vars privately with metadata key `:expose-` (instead of `:expose`)
