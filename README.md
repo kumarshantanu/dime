@@ -1,6 +1,7 @@
 # dime
 
 [![Build Status](https://travis-ci.org/kumarshantanu/dime.svg)](https://travis-ci.org/kumarshantanu/dime)
+[![cljdoc badge](https://cljdoc.org/badge/dime/dime)](https://cljdoc.org/d/dime/dime)
 
 Dependency Injection Made Easy for Clojure.
 [This blog post](https://medium.com/@kumarshantanu/dependency-injection-with-clojure-using-dime-af57b140bd3f)

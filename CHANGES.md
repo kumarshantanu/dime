@@ -25,9 +25,9 @@
 * Fix #2 - Add the ability to mark injectables as non-public
   - Expose vars privately with metadata key `:expose-` (instead of `:expose`)
   - Add dynamic var `dime.util/*expose-private-key*` as private-exposure meta key
-* [Todo] Documentation
+* Documentation
   - Documentation for private exposure
-  - [Todo] Cljdoc badge
+  - Cljdoc badge
 
 
 ## 0.5.1 / 2018-September-26
