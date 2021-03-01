@@ -1,4 +1,4 @@
-(defproject dime "0.5.1"
+(defproject dime "0.5.2-SNAPSHOT"
   :description "Dependency Injection Made Easy for Clojure"
   :url "https://github.com/kumarshantanu/dime"
   :license {:name "Eclipse Public License"
@@ -16,8 +16,9 @@
                    :global-vars {*unchecked-math* :warn-on-boxed}}
              :c09 {:dependencies [[org.clojure/clojure "1.9.0"]]
                    :global-vars {*unchecked-math* :warn-on-boxed}}
-             :c10 {:dependencies [[org.clojure/clojure "1.10.0-alpha7"]]
+             :c10 {:dependencies [[org.clojure/clojure "1.10.3-rc1"]]
                    :global-vars {*unchecked-math* :warn-on-boxed}}
              :dln {:jvm-opts ["-Dclojure.compiler.direct-linking=true"]}}
+  :aliases {"test-all" ["with-profile" "c05:c06:c07:c08:c09:c10" "test"]}
   :plugins [[lein-viz "0.3.0"]]
   :viz {:default {:source foo.init/viz-payload}})

@@ -66,7 +66,7 @@ $ lein do clean, test       # run tests in lowest supported Clojure version
 
 ## License
 
-Copyright © 2016-2018 Shantanu Kumar (kumar.shantanu@gmail.com, shantanu.kumar@concur.com)
+Copyright © 2016-2021 Shantanu Kumar
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
